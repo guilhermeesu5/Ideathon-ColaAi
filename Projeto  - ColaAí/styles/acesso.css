@@ -1,0 +1,425 @@
+.acesso{
+    --grade: color-mix(in srgb, var(--texto) 5%, transparent);
+
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+    padding: 0.75rem;
+    overflow: hidden;
+    background-color: var(--painel);
+    background-image:
+        linear-gradient(var(--grade) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grade) 1px, transparent 1px);
+    background-size: 3.5rem 3.5rem;
+    animation: aparecer 500ms var(--curva-suave);
+    transition: background-color 300ms ease;
+}
+
+/* ---------- fundo: linha de rota ao estilo do gráfico da referência ---------- */
+
+.acesso__fundo{
+    position: absolute;
+    inset: 0;
+    color: var(--destaque-texto);
+    pointer-events: none;
+}
+
+.acesso__fundo svg{
+    width: 100%;
+    height: 100%;
+}
+
+.fundo__rota{
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3;
+    stroke-opacity: 0.45;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: tracar 2.4s 0.3s var(--curva-suave) forwards;
+}
+
+.fundo__no{
+    fill: var(--painel);
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-opacity: 0.55;
+}
+
+.fundo__no--ativo{
+    fill: currentColor;
+    fill-opacity: 0.6;
+    stroke: none;
+}
+
+/* ---------- cartão escuro (as cores abaixo valem nos dois temas) ---------- */
+
+.acesso__cartao{
+    --texto: var(--branco);
+    --texto-suave: color-mix(in srgb, var(--branco) 62%, var(--preto));
+    --cartao-interno: color-mix(in srgb, var(--branco) 11%, var(--preto));
+    --borda: color-mix(in srgb, var(--branco) 13%, transparent);
+    --destaque: color-mix(in oklch, var(--vinho) 78%, var(--branco));
+    --destaque-texto: var(--vinho-claro);
+    --inverso: var(--branco);
+    --sobre-inverso: var(--preto);
+
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: min(100%, 56rem);
+    padding: 0.75rem;
+    background-color: color-mix(in srgb, var(--preto) 94%, var(--branco));
+    border: 1px solid var(--borda);
+    border-radius: 1.75rem;
+    box-shadow: 0 2.5rem 5rem -2rem color-mix(in srgb, var(--preto) 55%, transparent);
+    color: var(--texto);
+    animation: subir 700ms var(--curva-suave) both;
+}
+
+.acesso__formulario{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0.875rem 1.25rem;
+}
+
+.acesso__formulario .formulario{
+    margin-block: auto;
+}
+
+.acesso__topo{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.marca{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    text-decoration: none;
+}
+
+.marca__selo{
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    background-color: var(--vinho);
+    border-radius: 0.7rem;
+    box-shadow: inset 0 0 0 1px var(--borda);
+}
+
+.marca__imagem{
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.marca__nome{
+    font-size: 1.125rem;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+}
+
+.marca__nome b{
+    font-weight: 700;
+}
+
+/* ---------- painel vinho com a demonstração ---------- */
+
+.vitrine{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem 1.125rem 1.25rem;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    background:
+        radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--vinho) 70%, var(--branco)), transparent 70%),
+        linear-gradient(165deg, color-mix(in srgb, var(--vinho) 88%, var(--branco)), var(--vinho) 55%, color-mix(in srgb, var(--vinho) 80%, var(--preto)));
+    text-align: center;
+}
+
+.vitrine::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(color-mix(in srgb, var(--branco) 16%, transparent) 1px, transparent 1.5px);
+    background-size: 1.3125rem 1.3125rem;
+    mask-image: radial-gradient(90% 70% at 100% 0%, var(--preto), transparent);
+    pointer-events: none;
+}
+
+.vitrine__conteudo{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.875rem;
+    width: 100%;
+    animation: aparecer 400ms var(--curva-suave);
+}
+
+.vitrine .formulario__eyebrow{
+    color: color-mix(in srgb, var(--branco) 80%, var(--vinho));
+}
+
+.vitrine__titulo{
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+}
+
+.vitrine__titulo em{
+    display: block;
+    font-style: normal;
+    color: color-mix(in srgb, var(--branco) 72%, var(--vinho));
+}
+
+.vitrine__texto{
+    max-width: 20rem;
+    margin-top: -0.25rem;
+    font-size: 0.75rem;
+    color: color-mix(in srgb, var(--branco) 80%, var(--vinho));
+}
+
+.vitrine__nota{
+    position: relative;
+    font-size: 0.6875rem;
+    color: color-mix(in srgb, var(--branco) 70%, var(--vinho));
+}
+
+.demo{
+    width: 100%;
+    max-width: 21rem;
+    overflow: hidden;
+    background-color: color-mix(in srgb, var(--preto) 86%, var(--vinho));
+    border: 1px solid var(--borda);
+    border-radius: 1rem;
+    box-shadow: 0 1.25rem 2.5rem -1.25rem var(--preto);
+    text-align: left;
+}
+
+.demo__barra,
+.demo__linha,
+.demo__rodape{
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.625rem 0.875rem;
+}
+
+.demo__barra,
+.demo__linha{
+    border-bottom: 1px solid var(--borda);
+}
+
+.demo__barra{
+    font-size: 0.6875rem;
+}
+
+.demo__pontos{
+    display: flex;
+    gap: 0.25rem;
+}
+
+.demo__pontos i{
+    width: 0.4375rem;
+    height: 0.4375rem;
+    background-color: color-mix(in srgb, var(--branco) 22%, transparent);
+    border-radius: 50%;
+}
+
+.demo__titulo{
+    flex: 1;
+    text-align: center;
+    color: var(--texto-suave);
+}
+
+.demo__vivo{
+    display: flex;
+    align-items: center;
+    gap: 0.3125rem;
+    color: var(--destaque-texto);
+}
+
+.demo__vivo::before{
+    content: "";
+    width: 0.375rem;
+    height: 0.375rem;
+    background-color: currentColor;
+    border-radius: 50%;
+}
+
+.demo .avatar{
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.625rem;
+}
+
+.demo__pessoa{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.demo__pessoa small{
+    font-size: 0.6875rem;
+    font-weight: 400;
+    color: var(--texto-suave);
+}
+
+.demo__valor{
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--destaque-texto);
+}
+
+.demo__rodape{
+    font-size: 0.6875rem;
+    color: var(--texto-suave);
+}
+
+.demo__trilho{
+    position: relative;
+    flex: 1;
+    height: 0.1875rem;
+    overflow: hidden;
+    background-color: var(--borda);
+    border-radius: var(--raio-pilula);
+}
+
+.demo__trilho i{
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 62%;
+    background-color: var(--destaque-texto);
+}
+
+.notificacao{
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.875rem 0.5rem 0.5rem;
+    background-color: var(--branco);
+    border-radius: 0.875rem;
+    box-shadow: 0 1rem 2rem -1rem var(--preto);
+    color: var(--preto);
+    text-align: left;
+}
+
+.notificacao__icone{
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    background-color: color-mix(in srgb, var(--vinho) 12%, var(--branco));
+    border-radius: 0.625rem;
+    color: var(--vinho);
+}
+
+.notificacao__texto{
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.notificacao__texto small{
+    font-size: 0.6875rem;
+    font-weight: 400;
+    color: color-mix(in srgb, var(--preto) 60%, var(--branco));
+}
+
+.demo--preco{
+    padding: 1rem;
+}
+
+.demo__etiqueta{
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    background-color: color-mix(in srgb, var(--branco) 14%, transparent);
+    border-radius: var(--raio-pilula);
+    font-size: 0.6875rem;
+    font-weight: 500;
+}
+
+.demo__preco{
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1;
+}
+
+.demo__preco small{
+    font-size: 0.875rem;
+    letter-spacing: 0;
+}
+
+.demo__preco span{
+    margin-left: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--texto-suave);
+}
+
+.demo__legenda{
+    margin: 0.375rem 0 0.875rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid var(--borda);
+    font-size: 0.6875rem;
+    color: var(--texto-suave);
+}
+
+.demo__lista{
+    display: grid;
+    gap: 0.5rem;
+}
+
+.demo__lista li{
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.demo__lista .icone{
+    width: 1.125rem;
+    height: 1.125rem;
+    padding: 0.1875rem;
+    background-color: color-mix(in srgb, var(--branco) 14%, transparent);
+    border-radius: 50%;
+    color: var(--destaque-texto);
+}
+
+@media screen and (min-width: 1024px){
+    .acesso__cartao{
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .acesso__formulario{
+        padding: 1rem 2.25rem 1.25rem;
+    }
+
+    .vitrine{
+        padding: 2.25rem 1.75rem 1.5rem;
+    }
+}

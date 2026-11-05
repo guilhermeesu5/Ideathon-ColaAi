@@ -1,0 +1,72 @@
+.turnos__lista{
+    display: flex;
+    gap: 0.5rem;
+    padding-block: 0.375rem;
+}
+
+.turno{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6875rem;
+    min-height: 7.8125rem;
+    padding: 0.875rem 0.3125rem;
+    background-color: var(--cartao-interno);
+    border-radius: var(--raio-pilula);
+    transition: background-color 300ms ease, color 300ms ease, transform 450ms var(--curva-mola);
+}
+
+.turno:hover{
+    transform: translateY(-0.1875rem);
+}
+
+.turno:active{
+    transform: scale(0.96);
+}
+
+.turno__nome{
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--texto-suave);
+}
+
+.turno .icone{
+    width: 1.3125rem;
+    height: 1.3125rem;
+}
+
+.turno__hora{
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.turno[aria-pressed="true"]{
+    background-color: var(--inverso);
+    color: var(--sobre-inverso);
+    transform: scale(1.07);
+}
+
+.turno[aria-pressed="true"] .turno__nome{
+    color: inherit;
+    opacity: 0.7;
+}
+
+
+@media screen and (min-width: 1024px){
+    .turnos__lista{
+        flex: 1;
+        min-height: 5rem;
+    }
+
+    .turnos__lista{
+        align-items: center;
+    }
+
+    .turno{
+        min-height: 0;
+        max-height: 9rem;
+        height: 100%;
+    }
+}

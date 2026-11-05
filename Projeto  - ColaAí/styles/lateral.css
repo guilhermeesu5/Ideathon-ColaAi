@@ -1,0 +1,98 @@
+.lateral{
+    position: fixed;
+    left: 0.625rem;
+    right: 0.625rem;
+    bottom: 0.625rem;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.375rem;
+    background-color: var(--lateral);
+    border-radius: var(--raio-pilula);
+    box-shadow: 0 1rem 2rem -0.75rem color-mix(in srgb, var(--preto) 60%, transparent);
+}
+
+.lateral__marca{
+    display: none;
+}
+
+.lateral__nav{
+    display: flex;
+    flex: 1;
+    justify-content: space-around;
+}
+
+.lateral__botao{
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.375rem;
+    height: 2.375rem;
+    border-radius: 50%;
+    font-size: 1.0625rem;
+    color: color-mix(in srgb, var(--branco) 58%, var(--preto));
+    transition: background-color 250ms ease, color 250ms ease, transform 160ms var(--curva-suave);
+}
+
+.lateral__botao:hover{
+    color: var(--branco);
+}
+
+.lateral__botao:active{
+    transform: scale(0.92);
+}
+
+.lateral__botao--ativo{
+    background-color: var(--branco);
+    color: var(--preto);
+}
+
+.lateral__botao--ativo:hover{
+    color: var(--preto);
+}
+
+.lateral__sair{
+    background-color: color-mix(in srgb, var(--branco) 10%, transparent);
+    color: var(--branco);
+}
+
+@media screen and (min-width: 1024px){
+    .lateral{
+        position: static;
+        flex-direction: column;
+        height: 100%;
+        padding: 1.375rem 0 1.1875rem;
+        border-radius: var(--raio-cartao);
+    }
+
+    .lateral__marca{
+        display: block;
+        margin-bottom: 1.5em;
+    }
+
+    .lateral__imagem{
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .lateral__nav{
+        flex: 0;
+        flex-direction: column;
+        gap: 0.6875rem;
+        margin-block: auto;
+    }
+
+    .lateral__botao:hover::after{
+        content: attr(aria-label);
+        position: absolute;
+        left: calc(100% + 0.6875rem);
+        padding: 0.35em 0.8em;
+        background-color: var(--inverso);
+        color: var(--sobre-inverso);
+        border-radius: var(--raio-pilula);
+        font-size: 0.6875rem;
+        white-space: nowrap;
+        pointer-events: none;
+    }
+}

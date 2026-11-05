@@ -1,0 +1,213 @@
+.app{
+    max-width: 84rem;
+    margin: 0 auto;
+    padding: 0.625rem 0.625rem 4.8125rem;
+    animation: aparecer 500ms var(--curva-suave);
+}
+
+.painel{
+    display: flex;
+    flex-direction: column;
+    gap: 0.8125rem;
+    padding: 0.6875rem;
+    background-color: var(--painel);
+    border-radius: var(--raio-cartao);
+    transition: background-color 300ms ease;
+}
+
+.grade{
+    display: grid;
+    gap: 0.8125rem;
+}
+
+.coluna{
+    display: contents;
+}
+
+.cartao{
+    position: relative;
+    min-width: 0;
+    padding: 1rem;
+    background-color: var(--cartao);
+    border: 1px solid var(--borda);
+    border-radius: var(--raio-cartao);
+    box-shadow: var(--sombra);
+    animation: subir 700ms var(--curva-suave) both;
+    animation-delay: var(--atraso, 0ms);
+    transition: background-color 300ms ease, border-color 300ms ease, box-shadow 500ms var(--curva-suave);
+}
+
+.cartao--escuro{
+    background-color: var(--cartao-escuro);
+    border-color: transparent;
+    color: var(--branco);
+}
+
+.cartao--destaque{
+    box-shadow: var(--sombra), 0 0 0 0.1875rem color-mix(in srgb, var(--destaque-texto) 55%, transparent);
+}
+
+.cartao__cabecalho{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.625rem;
+    margin-bottom: 0.8125rem;
+}
+
+.cartao__titulo{
+    font-size: 1.1875rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+}
+
+.rotulo{
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+}
+
+.segmento{
+    display: inline-flex;
+    padding: 2px;
+    background-color: var(--cartao-interno);
+    border-radius: var(--raio-pilula);
+}
+
+.segmento__botao{
+    padding: 0.45em 1em;
+    border-radius: var(--raio-pilula);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--texto-suave);
+    transition: background-color 250ms var(--curva-suave), color 250ms ease;
+}
+
+.segmento__botao[aria-pressed="true"]{
+    background-color: var(--inverso);
+    color: var(--sobre-inverso);
+}
+
+.avatar{
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    background-color: var(--vinho);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--branco) 16%, transparent);
+    color: var(--branco);
+    font-size: 0.6875rem;
+    font-weight: 600;
+}
+
+.aviso{
+    position: fixed;
+    left: 50%;
+    bottom: 4.8125rem;
+    z-index: 30;
+    max-width: calc(100vw - 1.625rem);
+    padding: 0.8em 1.4em;
+    background-color: var(--inverso);
+    border-radius: var(--raio-pilula);
+    color: var(--sobre-inverso);
+    font-size: 0.6875rem;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 0.8125rem);
+    transition: opacity 250ms ease, transform 350ms var(--curva-suave);
+}
+
+.aviso--visivel{
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.rodape-painel{
+    font-size: 0.6875rem;
+    text-align: center;
+    color: var(--texto-suave);
+}
+
+/* ordem no mobile: o que o usuário decide primeiro vem antes */
+.cartao--modo{ order: 1; }
+.cartao--turnos{ order: 2; }
+.cartao--hubs{ order: 3; }
+.cartao--matches{ order: 4; }
+.cartao--carona{ order: 5; }
+.cartao--carro{ order: 6; }
+.cartao--rateio{ order: 7; }
+.hub{ order: 8; }
+.impacto{ order: 9; }
+
+/* desktop: o painel inteiro cabe na altura da janela (sem rolar a página) */
+@media screen and (min-width: 1024px){
+    .app{
+        display: grid;
+        grid-template-columns: 4.375rem minmax(0, 1fr);
+        gap: 1rem;
+        height: 100dvh;
+        max-width: none;
+        padding: 1.1875rem;
+        overflow: hidden;
+    }
+
+    .painel{
+        min-height: 0;
+        padding: 1.125rem;
+    }
+
+    .grade{
+        flex: 1;
+        min-height: 0;
+        grid-template-columns: 1.15fr 1fr 1fr 1fr;
+        grid-template-rows: minmax(0, 1fr);
+    }
+
+    .coluna{
+        display: flex;
+        flex-direction: column;
+        gap: 0.8125rem;
+        min-height: 0;
+    }
+
+    .cartao,
+    .mini{
+        order: 0;
+        flex-shrink: 0;
+    }
+
+    .cartao--hubs{
+        display: flex;
+        flex: 1.5 1 0;
+        flex-direction: column;
+        min-height: 11rem;
+    }
+
+    .cartao--matches{
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        min-height: 9rem;
+    }
+
+    .cartao--turnos,
+    .cartao--carro,
+    .cartao--carona{
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+    }
+
+    .rodape-painel{
+        display: none;
+    }
+
+    .aviso{
+        bottom: 1.625rem;
+    }
+}
