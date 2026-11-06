@@ -491,14 +491,72 @@ function premissasDoImpacto() {
     ];
 }
 
-function modeloDaColunaDoGrafico(valor, nome, maior) {
-    const proporcao = maior ? valor / maior : 0;
+const ICONES_DOS_TURNOS = { manha: "nascer", tarde: "sol", noite: "lua" };
+
+const METRICAS_DO_GRAFICO = {
+    caronas: {
+        fator: () => 1,
+        texto: valor => `${valor} ${valor === 1 ? "carona" : "caronas"}`,
+        eixo: valor => valor,
+    },
+    co2: {
+        fator: () => KG_CO2_POR_CARONA,
+        texto: valor => `${formatarNumero(valor)} kg de CO₂`,
+        eixo: valor => `${formatarNumero(valor, 0)} kg`,
+    },
+    economia: {
+        fator: economiaPorCarona,
+        texto: formatarReais,
+        eixo: valor => `R$ ${formatarNumero(valor, 0)}`,
+    },
+};
+
+const LARGURA_DA_CURVA = 400;
+const grafico = { metrica: "caronas", semana: NOMES_DAS_SEMANAS.length - 1 };
+
+function modeloDoTurnoDoImpacto([turno, valor], total) {
+    const { rotulo, horarios } = TURNOS[turno];
+    const parte = total ? Math.round(valor / total * 100) : 0;
     return `
-        <li class="grafico__coluna">
-            <span class="grafico__valor">${valor}</span>
-            <span class="grafico__barra"><i data-proporcao="${proporcao}"></i></span>
-            <span class="grafico__rotulo">${nome}</span>
+        <li class="impacto-turnos__item">
+            <span class="impacto-turnos__icone"><svg class="icone"><use href="#icone-${ICONES_DOS_TURNOS[turno]}"/></svg></span>
+            <span class="impacto-turnos__nome">${rotulo}<small>${horarios.ida} · ${horarios.volta}</small></span>
+            <span class="impacto-turnos__valor">${valor}<small>${parte}% das caronas</small></span>
         </li>`;
+}
+
+/* Eixo vertical com marcas "redondas" (1, 2, 5, 10…) e um respiro acima do maior valor. */
+function limitesDoEixo(maior) {
+    const bruto = maior / 4 || 1;
+    const potencia = 10 ** Math.floor(Math.log10(bruto));
+    const passo = [1, 2, 5, 10].map(fator => fator * potencia).find(valor => valor >= bruto);
+    let topo = Math.ceil(maior / passo) * passo || passo;
+    if (topo < maior * 1.1) topo += passo;
+    return { passo, topo };
+}
+
+function pontosDaCurva(valores, topo) {
+    return valores.map((valor, indice) => ({
+        x: (indice + 0.5) / valores.length * LARGURA_DA_CURVA,
+        y: 100 - valor / topo * 100,
+    }));
+}
+
+/* Curva suave (Catmull-Rom convertida em Bézier) passando por todos os pontos. */
+function caminhoSuave(pontos) {
+    const limitar = y => Math.min(Math.max(y, 0), 100);
+    return pontos.slice(1).reduce((caminho, atual, indice) => {
+        const anterior = pontos[indice - 1] ?? pontos[indice];
+        const inicio = pontos[indice];
+        const proximo = pontos[indice + 2] ?? atual;
+        const controleA = [inicio.x + (atual.x - anterior.x) / 6, limitar(inicio.y + (atual.y - anterior.y) / 6)];
+        const controleB = [atual.x - (proximo.x - inicio.x) / 6, limitar(atual.y - (proximo.y - inicio.y) / 6)];
+        return `${caminho} C${controleA} ${controleB} ${atual.x},${atual.y}`;
+    }, `${pontos[0].x},${pontos[0].y}`);
+}
+
+function modeloDoPontoDoGrafico(ponto, indice, texto) {
+    return `<button class="grafico__ponto" type="button" data-semana="${indice}" data-texto="${texto}" style="--x: ${ponto.x / LARGURA_DA_CURVA}; --y: ${ponto.y / 100}" aria-label="${NOMES_DAS_SEMANAS[indice]}: ${texto}"></button>`;
 }
 
 function modeloDaPremissa([rotulo, valor, detalhe]) {
@@ -514,25 +572,73 @@ function renderizarIndicadores() {
     $("#imp-caronas-detalhe").textContent = `${caronasConfirmadas()} combinadas por você`;
     $("#imp-co2").textContent = `${formatarNumero(total * KG_CO2_POR_CARONA, 0)} kg`;
     $("#imp-economia").textContent = formatarReais(total * economiaPorCarona());
+    $("#imp-co2-carona").textContent = `${formatarNumero(KG_CO2_POR_CARONA)} kg`;
+    $("#imp-economia-carona").textContent = formatarReais(economiaPorCarona());
     $("#imp-meta").textContent = `${Math.round(progresso * 100)}%`;
     $("#imp-meta-detalhe").textContent = faltam ? `Faltam ${faltam} para a meta de ${META_CARONAS_DO_MES}` : "Meta do mês atingida";
     $("#imp-meta-barra").style.setProperty("--proporcao", progresso);
 }
 
-function renderizarGraficos() {
-    const semanas = caronasPorSemana();
-    const maiorSemana = Math.max(...semanas);
-    $("#imp-semanas").innerHTML = semanas.map((valor, indice) => modeloDaColunaDoGrafico(valor, NOMES_DAS_SEMANAS[indice], maiorSemana)).join("");
+function destacarSemana(indice) {
+    grafico.semana = indice;
+    const pontos = $$("#imp-pontos .grafico__ponto");
+    pontos.forEach((ponto, posicao) => ponto.classList.toggle("grafico__ponto--ativo", posicao === indice));
 
-    const turnos = caronasPorTurno();
-    const maiorTurno = Math.max(...Object.values(turnos));
-    $("#imp-turnos").innerHTML = Object.entries(turnos).map(([turno, valor]) =>
-        modeloDaLinhaDoComparativo({ rotulo: TURNOS[turno].rotulo, valor }, maiorTurno, String)
-    ).join("");
+    const ativo = pontos[indice];
+    const area = $("#imp-area");
+    area.style.setProperty("--x", ativo.style.getPropertyValue("--x"));
+    area.style.setProperty("--y", ativo.style.getPropertyValue("--y"));
+    $("#imp-dica").innerHTML = `<small>${NOMES_DAS_SEMANAS[indice]}</small><strong>${ativo.dataset.texto}</strong>`;
+    $("#imp-dica").classList.toggle("grafico__dica--abaixo", Number(ativo.style.getPropertyValue("--y")) < 0.4);
+}
 
-    $$("#imp-semanas [data-proporcao], #imp-turnos [data-proporcao]").forEach(barra => {
-        barra.style.setProperty("--proporcao", barra.dataset.proporcao);
+function renderizarGraficoDeEvolucao() {
+    const metrica = METRICAS_DO_GRAFICO[grafico.metrica];
+    const fator = metrica.fator();
+    const valores = caronasPorSemana().map(caronas => caronas * fator);
+    const { passo, topo } = limitesDoEixo(Math.max(...valores));
+    const pontos = pontosDaCurva(valores, topo);
+    const linha = `M0,${pontos[0].y} L${caminhoSuave(pontos)} L${LARGURA_DA_CURVA},${pontos.at(-1).y}`;
+
+    $("#imp-linha").setAttribute("d", linha);
+    $("#imp-preenchimento").setAttribute("d", `${linha} L${LARGURA_DA_CURVA},100 L0,100 Z`);
+
+    const marcas = Array.from({ length: Math.round(topo / passo) + 1 }, (_, indice) => indice * passo);
+    $("#imp-grade").innerHTML = marcas.map(valor => `<i style="--posicao: ${valor / topo}"></i>`).join("");
+    $("#imp-eixo").innerHTML =marcas.map(valor => `<li style="--posicao: ${valor / topo}">${metrica.eixo(valor)}</li>`).join("");
+    $("#imp-semanas").innerHTML = NOMES_DAS_SEMANAS.map(nome => `<li>${nome}</li>`).join("");
+    $("#imp-pontos").innerHTML = pontos.map((ponto, indice) => modeloDoPontoDoGrafico(ponto, indice, metrica.texto(valores[indice]))).join("");
+    destacarSemana(grafico.semana);
+
+    const area = $("#imp-area");
+    area.classList.remove("grafico__area--revelando");
+    void area.offsetWidth;
+    area.classList.add("grafico__area--revelando");
+}
+
+function trocarMetricaDoGrafico(nome) {
+    grafico.metrica = nome;
+    $$("[data-metrica]").forEach(botao => {
+        const ativa = botao.dataset.metrica === nome;
+        botao.classList.toggle("pilula--ativa", ativa);
+        botao.setAttribute("aria-pressed", String(ativa));
     });
+    renderizarGraficoDeEvolucao();
+}
+
+function alternarCalculo() {
+    const painel = $("#imp-calculo");
+    painel.hidden = !painel.hidden;
+    $("#imp-calculo-botao").setAttribute("aria-expanded", String(!painel.hidden));
+    $("#imp-calculo-botao").classList.toggle("pilula--ativa", !painel.hidden);
+    if (!painel.hidden) painel.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+
+function renderizarGraficos() {
+    const turnos = caronasPorTurno();
+    const total = Object.values(turnos).reduce((soma, valor) => soma + valor, 0);
+    $("#imp-turnos").innerHTML = Object.entries(turnos).map(turno => modeloDoTurnoDoImpacto(turno, total)).join("");
+    renderizarGraficoDeEvolucao();
 }
 
 function renderizarPaginaImpacto() {
@@ -698,10 +804,22 @@ const ROTULOS_DO_STATUS = {
     motorista: { nenhum: "Disponível", pendente: "Pediu carona", aceito: "Aceito", recusado: "Recusado" },
 };
 
-function linkDoWhatsapp(colega) {
+const NUMERO_DE_WHATSAPP = /^55\d{10,11}$/;
+
+/* Click to Chat: com número válido em dados.js abre a conversa com o colega;
+   sem número, abre o WhatsApp só com a mensagem, para escolher o contato. */
+function urlDoWhatsapp(colega) {
+    const numero = String(colega.whatsapp || "").replace(/\D/g, "");
+    const destino = NUMERO_DE_WHATSAPP.test(numero) ? numero : "";
     const horario = TURNOS[colega.turno].horarios[colega.sentido];
     const texto = `Oi, ${primeiroNome(colega.nome)}! Combinamos a carona pelo ColaAí (${horario}). Vamos acertar o Pix?`;
-    return `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    return `https://wa.me/${destino}?text=${encodeURIComponent(texto)}`;
+}
+
+function abrirWhatsApp(id) {
+    const colega = colegaPorId(id);
+    if (!colega) return avisar("Colega não encontrado.");
+    window.open(urlDoWhatsapp(colega), "_blank", "noopener,noreferrer");
 }
 
 function modeloDasAcoes(colega, status) {
@@ -709,7 +827,7 @@ function modeloDasAcoes(colega, status) {
     const motorista = estado.usuario.papel === "motorista";
     const botao = (atributo, texto, classe) =>
         `<button class="botao ${classe}" type="button" data-${atributo}="${id}">${texto}</button>`;
-    const whatsapp = `<a class="botao botao--primario" href="${linkDoWhatsapp(colega)}" target="_blank" rel="noopener noreferrer">Chamar no WhatsApp</a>`;
+    const whatsapp = botao("whatsapp", "Chamar no WhatsApp", "botao--primario");
 
     if (!colega.compativel) return `<button class="botao botao--contorno" type="button" disabled>Outro turno</button>`;
     if (status === "aceito") return whatsapp + botao("cancelar", motorista ? "Desfazer" : "Cancelar", "botao--contorno");
@@ -1152,6 +1270,9 @@ const acoesDoPainel = {
     aceitar: id => agirNoPedido(aceitarPedido, id),
     recusar: id => agirNoPedido(recusarPedido, id),
     pagina: abrirPagina,
+    whatsapp: abrirWhatsApp,
+    metrica: trocarMetricaDoGrafico,
+    semana: indice => destacarSemana(Number(indice)),
     copiar: copiarValor,
     alvo: irParaCartao,
 };
@@ -1166,6 +1287,12 @@ function tratarCliqueNoPainel(evento) {
 function ligarPainel() {
     $("#tela-app").addEventListener("click", tratarCliqueNoPainel);
     $("#botao-sair").addEventListener("click", sair);
+    $("#imp-calculo-botao").addEventListener("click", alternarCalculo);
+
+    ["mouseover", "focusin"].forEach(tipo => $("#imp-pontos").addEventListener(tipo, evento => {
+        const ponto = evento.target.closest("[data-semana]");
+        if (ponto) destacarSemana(Number(ponto.dataset.semana));
+    }));
 
     $("#busca").addEventListener("input", evento => mudarContexto({ busca: evento.target.value }));
 
@@ -1193,40 +1320,6 @@ function ligarPainel() {
             renderizarRateios();
         });
     });
-}
-/* ---------- integração Click to Chat do WhatsApp ---------- */
-
-function abrirWhatsApp(id) {
-    const colega = colegaPorId(id);
-
-    if (!colega) {
-        avisar("Colega não encontrado.");
-        return;
-    }
-
-    // Configure o contato de cada colega no arquivo dados.js.
-    const numero = String(colega.whatsapp || "").replace(/\D/g, "");
-
-    if (!/^55\d{10,11}$/.test(numero)) {
-        avisar("Cadastre um WhatsApp válido para este colega no arquivo dados.js.");
-        return;
-    }
-
-    const horario = TURNOS[colega.turno].horarios[colega.sentido];
-    const trajeto = colega.sentido === "ida"
-        ? "para a FATEC Araçatuba"
-        : "saindo da FATEC Araçatuba";
-
-    const mensagem = `Olá, ${primeiroNome(colega.nome)}! ` +
-        `Vi seu perfil no ColaAí e gostaria de combinar ` +
-        `uma carona ${trajeto}, às ${horario}.`;
-
-    const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`; //linha da api
-    window.open(url, "_blank", "noopener,noreferrer");
-}
-
-function confirmarMantendoFoco(id) {
-    abrirWhatsApp(id);
 }
 
 /* ---------- início ---------- */

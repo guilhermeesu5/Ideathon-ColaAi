@@ -196,8 +196,7 @@
 /* entrada escalonada: só roda quando a página abre, para os cartões não piscarem a cada clique */
 .pagina--entrando .pagina__cabecalho,
 .pagina--entrando .pagina-matches__filtros,
-.pagina--entrando .pedido,
-.pagina--entrando .indicador{
+.pagina--entrando .pedido{
     animation: subir 600ms var(--curva-suave) both;
     animation-delay: var(--atraso, 0ms);
 }
@@ -211,7 +210,3 @@
 .pagina--entrando .pedido:nth-child(5){ --atraso: 360ms; }
 .pagina--entrando .pedido:nth-child(n+6){ --atraso: 420ms; }
 
-.pagina--entrando .indicador:nth-child(1){ --atraso: 60ms; }
-.pagina--entrando .indicador:nth-child(2){ --atraso: 120ms; }
-.pagina--entrando .indicador:nth-child(3){ --atraso: 180ms; }
-.pagina--entrando .indicador:nth-child(4){ --atraso: 240ms; }

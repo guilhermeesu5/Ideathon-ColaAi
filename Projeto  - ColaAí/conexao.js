@@ -10,28 +10,34 @@ function mostrarEstado(texto, erro = false) {
     estado.classList.toggle("conexao__estado--erro", erro);
 }
 
-function mostrarTabelas(definicoes) {
-    listaTabelas.replaceChildren(...Object.entries(definicoes).map(([nome, def]) => {
-        const item = document.createElement("li");
-        item.className = "conexao__tabela";
-        item.textContent = `${nome}: ${Object.keys(def.properties || {}).join(", ")}`;
-        return item;
-    }));
+/* A chave anon não pode listar o esquema (só a secret pode), então testamos
+   as tabelas e visões do modelo proposto, uma a uma. */
+const TABELAS_ESPERADAS = [
+    "allowed_email_domains", "profiles", "profile_contacts", "hubs", "vehicles",
+    "rides", "ride_requests", "available_rides", "incoming_requests",
+];
+
+async function descreverTabela(nome) {
+    const resposta = await consultarSupabase(`${nome}?select=*&limit=1`);
+    if (resposta.status === 404) return `${nome}: não existe`;
+    if (!resposta.ok) return `${nome}: sem acesso para a chave anon (HTTP ${resposta.status})`;
+    const [linha] = await resposta.json();
+    return linha ? `${nome}: ${Object.keys(linha).join(", ")}` : `${nome}: existe, mas sem linhas visíveis para a chave anon`;
 }
 
 async function testarConexao() {
     listaTabelas.replaceChildren();
     mostrarEstado("Testando…");
     try {
-        const resposta = await consultarSupabase("");
-        if (!resposta.ok) {
-            mostrarEstado(`O Supabase recusou a chave (HTTP ${resposta.status}).`, true);
-            return;
-        }
-        const { definitions = {} } = await resposta.json();
-        const quantidade = Object.keys(definitions).length;
-        mostrarEstado(quantidade ? `Conectado. ${quantidade} tabela(s)/visão(ões) visíveis para a chave anon.` : "Conectado, mas a chave anon não enxerga nenhuma tabela.");
-        mostrarTabelas(definitions);
+        const resultados = await Promise.all(TABELAS_ESPERADAS.map(descreverTabela));
+        const algumaExiste = resultados.some(texto => !texto.endsWith("não existe"));
+        mostrarEstado(algumaExiste ? "Conectado. Resultado por tabela:" : "A chave falou com o Supabase, mas nenhuma tabela esperada existe.", !algumaExiste);
+        listaTabelas.replaceChildren(...resultados.map(texto => {
+            const item = document.createElement("li");
+            item.className = "conexao__tabela";
+            item.textContent = texto;
+            return item;
+        }));
     } catch {
         mostrarEstado("Não consegui falar com o Supabase (rede ou CORS).", true);
     }

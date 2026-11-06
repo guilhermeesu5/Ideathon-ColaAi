@@ -709,55 +709,107 @@
 
                     <div class="pagina-impacto__corpo">
 
-                        <ul class="indicadores" aria-label="Indicadores do mês">
-                            <li class="indicador">
-                                <span class="rotulo">Caronas no mês</span>
-                                <strong class="indicador__valor" id="imp-caronas">0</strong>
-                                <span class="indicador__detalhe" id="imp-caronas-detalhe"></span>
-                            </li>
-                            <li class="indicador">
-                                <span class="rotulo">CO₂ evitado</span>
-                                <strong class="indicador__valor" id="imp-co2">0 kg</strong>
-                                <span class="indicador__detalhe">menos gases de efeito estufa</span>
-                            </li>
-                            <li class="indicador">
-                                <span class="rotulo">Economia dos alunos</span>
-                                <strong class="indicador__valor" id="imp-economia">R$ 0,00</strong>
-                                <span class="indicador__detalhe">em relação ao ônibus</span>
-                            </li>
-                            <li class="indicador indicador--meta">
-                                <span class="rotulo">Meta do mês</span>
-                                <strong class="indicador__valor" id="imp-meta">0%</strong>
-                                <span class="indicador__barra"><i id="imp-meta-barra"></i></span>
-                                <span class="indicador__detalhe" id="imp-meta-detalhe"></span>
-                            </li>
-                        </ul>
-
-                        <section class="cartao grafico" aria-labelledby="grafico-titulo">
+                        <section class="cartao impacto-total" aria-labelledby="total-titulo">
                             <div class="cartao__cabecalho">
-                                <h2 class="cartao__titulo" id="grafico-titulo">Caronas por semana</h2>
+                                <h2 class="rotulo" id="total-titulo">Caronas no mês</h2>
+                                <span class="pilula pilula--ativa">Este mês</span>
                             </div>
-                            <ul class="grafico__colunas" id="imp-semanas"></ul>
+                            <strong class="impacto-total__valor" id="imp-caronas">0</strong>
+                            <p class="impacto-total__detalhe" id="imp-caronas-detalhe"></p>
+                        </section>
+
+                        <section class="cartao impacto-meta" aria-labelledby="meta-titulo">
+                            <div class="impacto-meta__topo">
+                                <h2 class="rotulo" id="meta-titulo">Meta do mês</h2>
+                                <strong class="impacto-meta__valor" id="imp-meta">0%</strong>
+                            </div>
+                            <span class="impacto-meta__barra"><i id="imp-meta-barra"></i></span>
+                            <p class="impacto-meta__detalhe" id="imp-meta-detalhe"></p>
+                            <button class="botao botao--primario" type="button" data-pagina="matches">
+                                Combinar uma carona
+                                <svg class="icone"><use href="#icone-seta"/></svg>
+                            </button>
+                        </section>
+
+                        <section class="cartao impacto-turnos" aria-labelledby="turnos-impacto-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="turnos-impacto-titulo">Caronas por turno</h2>
+                            </div>
+                            <ul class="impacto-turnos__lista" id="imp-turnos"></ul>
+                        </section>
+
+                        <section class="cartao impacto-numeros" aria-labelledby="numeros-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="numeros-titulo">Seus números</h2>
+                                <button class="pilula" type="button" id="imp-calculo-botao" aria-expanded="false" aria-controls="imp-calculo">Como calculamos</button>
+                            </div>
+                            <ul class="impacto-numeros__grade">
+                                <li class="impacto-numero">
+                                    <span class="impacto-numero__icone"><svg class="icone"><use href="#icone-folha"/></svg></span>
+                                    <strong class="impacto-numero__valor" id="imp-co2">0 kg</strong>
+                                    <span class="impacto-numero__rotulo">CO₂ evitado</span>
+                                    <span class="impacto-numero__detalhe">menos gases de efeito estufa</span>
+                                </li>
+                                <li class="impacto-numero">
+                                    <span class="impacto-numero__icone"><svg class="icone"><use href="#icone-carteira"/></svg></span>
+                                    <strong class="impacto-numero__valor" id="imp-economia">R$ 0,00</strong>
+                                    <span class="impacto-numero__rotulo">Economia dos alunos</span>
+                                    <span class="impacto-numero__detalhe">em relação ao ônibus</span>
+                                </li>
+                                <li class="impacto-numero">
+                                    <span class="impacto-numero__icone"><svg class="icone"><use href="#icone-carro"/></svg></span>
+                                    <strong class="impacto-numero__valor" id="imp-co2-carona">0 kg</strong>
+                                    <span class="impacto-numero__rotulo">CO₂ por carona</span>
+                                    <span class="impacto-numero__detalhe">ida e volta</span>
+                                </li>
+                                <li class="impacto-numero">
+                                    <span class="impacto-numero__icone"><svg class="icone"><use href="#icone-usuarios"/></svg></span>
+                                    <strong class="impacto-numero__valor" id="imp-economia-carona">R$ 0,00</strong>
+                                    <span class="impacto-numero__rotulo">Economia por carona</span>
+                                    <span class="impacto-numero__detalhe">com o seu rateio</span>
+                                </li>
+                            </ul>
+                        </section>
+
+                        <section class="cartao impacto-grafico" aria-labelledby="grafico-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="grafico-titulo">Evolução do mês</h2>
+                                <div class="pilulas" role="group" aria-label="Indicador do gráfico">
+                                    <button class="pilula pilula--ativa" type="button" data-metrica="caronas" aria-pressed="true">Caronas</button>
+                                    <button class="pilula" type="button" data-metrica="co2" aria-pressed="false">CO₂</button>
+                                    <button class="pilula" type="button" data-metrica="economia" aria-pressed="false">Economia</button>
+                                </div>
+                            </div>
+                            <div class="grafico">
+                                <ul class="grafico__eixo" id="imp-eixo" aria-hidden="true"></ul>
+                                <div class="grafico__area" id="imp-area">
+                                    <div class="grafico__grade" id="imp-grade" aria-hidden="true"></div>
+                                    <svg class="grafico__curva" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true">
+                                        <defs>
+                                            <linearGradient id="imp-gradiente" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0" style="stop-color: var(--destaque-texto); stop-opacity: 0.55"/>
+                                                <stop offset="1" style="stop-color: var(--destaque-texto); stop-opacity: 0"/>
+                                            </linearGradient>
+                                        </defs>
+                                        <path class="grafico__preenchimento" id="imp-preenchimento"/>
+                                        <path class="grafico__linha" id="imp-linha"/>
+                                    </svg>
+                                    <span class="grafico__guia" id="imp-guia"></span>
+                                    <output class="grafico__dica" id="imp-dica"></output>
+                                    <div id="imp-pontos"></div>
+                                </div>
+                                <ul class="grafico__semanas" id="imp-semanas" aria-hidden="true"></ul>
+                            </div>
                             <p class="comparativo__nota">Semanas anteriores simuladas. A semana atual inclui o que você combinou.</p>
                         </section>
 
-                        <div class="pagina-impacto__lateral">
+                        <section class="cartao impacto-calculo" id="imp-calculo" aria-labelledby="premissas-titulo" hidden>
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="premissas-titulo">Como calculamos</h2>
+                            </div>
+                            <ul class="premissas" id="imp-premissas"></ul>
+                        </section>
 
-                            <section class="cartao" aria-labelledby="turnos-impacto-titulo">
-                                <div class="cartao__cabecalho">
-                                    <h2 class="cartao__titulo" id="turnos-impacto-titulo">Caronas por turno</h2>
-                                </div>
-                                <ul class="comparativo__linhas" id="imp-turnos"></ul>
-                            </section>
-
-                            <section class="cartao" aria-labelledby="premissas-titulo">
-                                <div class="cartao__cabecalho">
-                                    <h2 class="cartao__titulo" id="premissas-titulo">Como calculamos</h2>
-                                </div>
-                                <ul class="premissas" id="imp-premissas"></ul>
-                            </section>
-
-                        </div>
                     </div>
                 </section>
 

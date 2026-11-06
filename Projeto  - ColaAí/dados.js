@@ -11,13 +11,13 @@ const TURNOS = {
 };
 
 const COLEGAS = [
-   { id: "lucas",    nome: "Lucas Moreira",   curso: "ADS · 3º sem",            papel: "motorista",  turno: "manha", sentido: "ida",   carro: "Fiat Argo",       cor: "Prata",    vagas: 3, km: 7, whatsapp: "5518996028780" },
-    { id: "marina",   nome: "Marina Duarte",   curso: "Gestão Empresarial · 5º", papel: "motorista",  turno: "manha", sentido: "ida",   carro: "Hyundai HB20",    cor: "Branco",   vagas: 2, km: 5, whatsapp: "" },
-    { id: "rafael",   nome: "Rafael Nogueira", curso: "ADS · 6º sem",            papel: "motorista",  turno: "tarde", sentido: "ida",   carro: "VW Gol",          cor: "Preto",    vagas: 3, km: 9, whatsapp: "" },
-    { id: "beatriz",  nome: "Beatriz Salles",  curso: "Big Data no Agro · 2º",   papel: "motorista",  turno: "noite", sentido: "ida",   carro: "Chevrolet Onix",  cor: "Cinza",    vagas: 2, km: 6, whatsapp: "" },
-    { id: "pedro",    nome: "Pedro Valença",   curso: "ADS · 4º sem",            papel: "motorista",  turno: "noite", sentido: "ida",   carro: "Renault Kwid",    cor: "Laranja",  vagas: 1, km: 11, whatsapp: "" },
-    { id: "camila",   nome: "Camila Rocha",    curso: "Gestão Empresarial · 3º", papel: "motorista",  turno: "noite", sentido: "volta", carro: "Toyota Etios",    cor: "Prata",    vagas: 3, km: 8, whatsapp: "" },
-    { id: "diego",    nome: "Diego Fontes",    curso: "ADS · 5º sem",            papel: "motorista",  turno: "manha", sentido: "volta", carro: "Honda Fit",       cor: "Azul",     vagas: 3, km: 10, whatsapp: "" },
+    { id: "lucas",    nome: "Lucas Moreira",   curso: "ADS · 3º sem",            papel: "motorista",  turno: "manha", sentido: "ida",   carro: "Fiat Argo",       cor: "Branco", placa: "FTC1A23",    vagas: 3, km: 7, whatsapp: "" },
+    { id: "marina",   nome: "Marina Duarte",   curso: "Gestão Empresarial · 5º", papel: "motorista",  turno: "manha", sentido: "ida",   carro: "Volkswagen Polo", cor: "Prata", placa: "FTC2B34",   vagas: 2, km: 5, whatsapp: "" },
+    { id: "rafael",   nome: "Rafael Nogueira", curso: "ADS · 6º sem",            papel: "motorista",  turno: "tarde", sentido: "ida",   carro: "Chevrolet Onix",  cor: "Prata", placa: "FTC3C45",    vagas: 3, km: 9, whatsapp: "" },
+    { id: "beatriz",  nome: "Guilherme Almeida", curso: "Big Data no Agro · 2º",   papel: "motorista",  turno: "noite", sentido: "ida",   carro: "Chevrolet Onix",  cor: "Prata", placa: "FTC4D56",    vagas: 2, km: 6, whatsapp: "" },
+    { id: "pedro",    nome: "Pedro Valença",   curso: "ADS · 4º sem",            papel: "motorista",  turno: "noite", sentido: "ida",   carro: "Fiat Argo",       cor: "Branco", placa: "FTC5E67",  vagas: 1, km: 11, whatsapp: "" },
+    { id: "camila",   nome: "Camila Rocha",    curso: "Gestão Empresarial · 3º", papel: "motorista",  turno: "noite", sentido: "volta", carro: "Volkswagen Polo", cor: "Prata", placa: "FTC6F78",    vagas: 3, km: 8, whatsapp: "" },
+    { id: "diego",    nome: "Diego Fontes",    curso: "ADS · 5º sem",            papel: "motorista",  turno: "manha", sentido: "volta", carro: "Chevrolet Onix",  cor: "Prata", placa: "FTC7G89",     vagas: 3, km: 10, whatsapp: "" },
 
     { id: "ana",      nome: "Ana Clara Lima",  curso: "ADS · 1º sem",            papel: "passageiro", turno: "manha", sentido: "ida",   km: 6, whatsapp: "" },
     { id: "joao",     nome: "João Vitor Prado", curso: "Gestão Empresarial · 2º", papel: "passageiro", turno: "manha", sentido: "ida",   km: 9, whatsapp: "" },
@@ -35,9 +35,9 @@ const HUBS = [
     { id: "fatec",    nome: "FATEC",    ativo: true,  lat: -21.18163, lng: -50.44969 },
 ];
 
-/* Ponto de partida da demonstração: Rua João Arruda Brasil, 100 (Condomínio Belo Horizonte).
+/* Ponto de partida da demonstração: um ponto de exemplo na região central de Araçatuba, não é endereço de ninguém.
    No produto, viria do perfil de cada usuário. */
-const CASA = { id: "casa", nome: "Minha casa", ativo: false, casa: true, lat: -21.20653, lng: -50.45017 };
+const CASA = { id: "casa", nome: "Minha casa", ativo: false, casa: true, lat: -21.2015, lng: -50.4435 };
 
 /* Histórico simulado do mês: caronas por semana e por turno (os dois somam o mesmo total). */
 const HISTORICO_SIMULADO = {
