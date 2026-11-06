@@ -6,6 +6,19 @@ O ColaAí conecta quem tem um lugar sobrando no carro com colegas que vão para 
 
 > **Status:** projeto em desenvolvimento. Este repositório reúne, por enquanto, a **documentação**, os **wireframes** e o **vídeo de apresentação do protótipo**. O código da aplicação ainda não foi publicado aqui — veja Como rodar e Próximos passos.
 
+## Sumário
+
+- [O problema](#o-problema)
+- [A solução](#a-solução)
+- [Como funciona](#como-funciona)
+- [Arquitetura](#arquitetura)
+- [Protótipo](#protótipo)
+- [Limitações da primeira versão](#limitações-da-primeira-versão)
+- [Impacto](#impacto)
+- [Como rodar](#como-rodar)
+- [Próximos passos](#próximos-passos)
+- [Documentação](#documentação)
+
 ## O problema
 
 - **Custo alto para quem vai de ônibus.** A tarifa do transporte coletivo de Araçatuba é de R$ 5,30 por viagem. Considerando que 2 viagens por dia em 20 dias úteis, são R$ 212 por mês para o aluno sem benefício integral.
@@ -102,7 +115,7 @@ Esta seção será atualizada com instruções definitivas assim que o código f
 
 ## Próximos passos
 
-- Ativar os demais hubs (Centro e Shopping), além da FATEC.
+- Ampliar os demais hubs (Centro e Shopping), além da FATEC.
 - Avaliar rastreamento por GPS e mapas interativos para localizar motoristas e passageiros.
 - Explorar uma integração de pagamento assistido (ex.: Pix), sem a plataforma assumir custódia do dinheiro.
 - Automatizar a validação de CNH e a checagem de antecedentes, possivelmente via parceria com um serviço externo.
