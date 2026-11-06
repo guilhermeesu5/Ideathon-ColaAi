@@ -4,7 +4,7 @@ const CONSUMO_KM_POR_LITRO = 11;
 const PRECO_LITRO = 6.3;
 const PASSAGEIROS_NA_LISTA = 2;
 const KG_CO2_POR_CARONA = 1.9;
-const CARONAS_BASE_DO_MES = 12;
+const CARONAS_BASE_DO_MES = HISTORICO_SIMULADO.semanas.reduce((soma, caronas) => soma + caronas, 0);
 const META_CARONAS_DO_MES = 20;
 const CHAVE_TEMA = "colaai-tema";
 const ESTILO_MAPA = {
@@ -18,10 +18,18 @@ const CORES_DA_ROTA = {
 const URL_ROTAS = "https://router.project-osrm.org/route/v1/driving";
 const DURACAO_AVISO_MS = 2600;
 const DURACAO_DESTAQUE_MS = 1100;
+const ATRASO_DA_RESPOSTA_MS = 2200;
+const DURACAO_ENTRADA_MS = 1100;
+const COLEGAS_QUE_RECUSAM = ["pedro"];
+const PAGINAS_DO_APP = ["painel", "matches", "rateio", "impacto"];
+const TARIFA_DO_ONIBUS = 5.3;
+const SEMANAS_NO_MES = 4;
+const KG_CO2_POR_KM = 0.12;
 
 let mapa;
 let caminhoDaRota;
 const rotulosDosHubs = {};
+const temporizadoresDosPedidos = {};
 
 const estado = {
     usuario: null,
@@ -32,7 +40,11 @@ const estado = {
     selecionadoId: null,
     km: 8,
     pessoas: 2,
+    dias: 5,
+    consumo: CONSUMO_KM_POR_LITRO,
+    preco: PRECO_LITRO,
     confirmacoes: {},
+    pedidos: {},
 };
 
 const $ = (seletor, raiz = document) => raiz.querySelector(seletor);
@@ -47,7 +59,7 @@ function emailInstitucional(email) {
 }
 
 function custoDaViagem(km) {
-    return (km / CONSUMO_KM_POR_LITRO) * PRECO_LITRO;
+    return (km / estado.consumo) * estado.preco;
 }
 
 function rateioPorPessoa(km, passageiros) {
@@ -91,16 +103,42 @@ function confirmadosDoContexto() {
     return estado.confirmacoes[chave];
 }
 
+function chaveDoColega(colega) {
+    return `${colega.sentido}-${colega.turno}-${estado.usuario.papel}`;
+}
+
+function confirmadosDoColega(colega) {
+    const chave = chaveDoColega(colega);
+    estado.confirmacoes[chave] ??= new Set();
+    return estado.confirmacoes[chave];
+}
+
+function estaAceito(colega) {
+    return confirmadosDoColega(colega).has(colega.id);
+}
+
+function statusDoPedido(colega) {
+    if (estaAceito(colega)) return "aceito";
+    return estado.pedidos[colega.id] ?? (estado.usuario.papel === "motorista" ? "pendente" : "nenhum");
+}
+
+function resumoDosPedidos() {
+    const colegas = COLEGAS.filter(colega => colega.papel === papelBuscado());
+    const contar = status => colegas.filter(colega => statusDoPedido(colega) === status).length;
+    return { pendente: contar("pendente"), aceito: contar("aceito"), recusado: contar("recusado") };
+}
+
 function totalDeCaronas() {
     const confirmadas = Object.values(estado.confirmacoes).reduce((soma, ids) => soma + ids.size, 0);
     return CARONAS_BASE_DO_MES + confirmadas;
 }
 
 function alternarConfirmacao(id) {
-    const confirmados = confirmadosDoContexto();
+    const confirmados = confirmadosDoColega(colegaPorId(id));
 
     if (confirmados.has(id)) {
         confirmados.delete(id);
+        delete estado.pedidos[id];
         return;
     }
 
@@ -112,6 +150,7 @@ function alternarConfirmacao(id) {
     }
 
     confirmados.add(id);
+    delete estado.pedidos[id];
     avisar(`Combinado com ${colegaPorId(id).nome.split(" ")[0]}. O Pix é entre vocês.`);
 }
 
@@ -160,20 +199,41 @@ function temaSalvo() {
 /* ---------- telas ---------- */
 
 function mostrarTela() {
-    const noPainel = location.hash === "#painel" && Boolean(estado.usuario);
+    const pagina = location.hash.slice(1);
+    const ehDoApp = PAGINAS_DO_APP.includes(pagina);
 
-    if (location.hash === "#painel" && !estado.usuario) {
+    if (ehDoApp && !estado.usuario) {
         location.hash = "#entrar";
         return;
     }
 
-    $("#tela-acesso").hidden = noPainel;
-    $("#tela-app").hidden = !noPainel;
-    if (noPainel) {
+    $("#tela-acesso").hidden = ehDoApp;
+    $("#tela-app").hidden = !ehDoApp;
+    if (ehDoApp) {
         renderizarPainel();
-        iniciarMapa();
+        mostrarPagina(pagina);
     }
     window.scrollTo(0, 0);
+}
+
+function mostrarPagina(nome) {
+    PAGINAS_DO_APP.forEach(pagina => {
+        const idDaPagina = pagina === "painel" ? "grade-painel" : `pagina-${pagina}`;
+        document.getElementById(idDaPagina).hidden = pagina !== nome;
+    });
+    $$("[data-pagina]").forEach(botao => botao.classList.toggle("lateral__botao--ativo", botao.dataset.pagina === nome));
+    if (nome === "painel") iniciarMapa();
+    animarEntradaDaPagina(nome);
+}
+
+function animarEntradaDaPagina(nome) {
+    if (nome === "painel") return;
+
+    const pagina = $(`#pagina-${nome}`);
+    pagina.classList.remove("pagina--entrando");
+    void pagina.offsetWidth;
+    pagina.classList.add("pagina--entrando");
+    setTimeout(() => pagina.classList.remove("pagina--entrando"), DURACAO_ENTRADA_MS);
 }
 
 function entrar(usuario) {
@@ -182,13 +242,22 @@ function entrar(usuario) {
 }
 
 function sair() {
+    Object.values(temporizadoresDosPedidos).forEach(clearTimeout);
     estado.usuario = null;
     estado.selecionadoId = null;
+    estado.confirmacoes = {};
+    estado.pedidos = {};
     reiniciarAcesso();
     location.hash = "#entrar";
 }
 
 /* ---------- acesso: formulários, validação e envio ---------- */
+
+const PLACA_VALIDA = /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/;
+
+function normalizarPlaca(valor) {
+    return valor.toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
 
 const regrasDeCampo = {
     email: campo => emailInstitucional(campo.value) ? "" : "Use seu e-mail @aluno.cps.sp.gov.br ou @fatec.sp.gov.br.",
@@ -196,6 +265,7 @@ const regrasDeCampo = {
     confirmar: campo => campo.value === campo.form.elements.senha.value ? "" : "As senhas precisam ser iguais.",
     nome: campo => campo.value.trim().split(/\s+/).length >= 2 ? "" : "Informe nome e sobrenome.",
     carro: campo => campo.value.trim().length >= 2 ? "" : "Informe o modelo do seu carro.",
+    placa: campo => !campo.value.trim() || PLACA_VALIDA.test(normalizarPlaca(campo.value)) ? "" : "Informe a placa no formato ABC1D23.",
     termos: campo => campo.checked ? "" : "Aceite os termos para criar a conta.",
 };
 
@@ -222,7 +292,8 @@ function montarUsuario(formulario) {
         nome: dados.get("nome") || nomeDoEmail(email),
         email,
         papel: dados.get("perfil") ?? "passageiro",
-        carro: dados.get("carro") || "Seu carro",
+        carro: dados.get("carro") || "Honda Civic",
+        placa: normalizarPlaca(dados.get("placa") ?? ""),
         vagas: Number(dados.get("vagas") ?? 3),
     };
 }
@@ -288,6 +359,9 @@ function renderizarPainel() {
     renderizarCarona();
     renderizarRateio();
     renderizarImpacto();
+    renderizarPaginaMatches();
+    renderizarPaginaRateio();
+    renderizarPaginaImpacto();
     renderizarMapa();
 }
 
@@ -336,7 +410,11 @@ function modeloDaLinha(colega, confirmados) {
     ].filter(Boolean).join(" ");
     const turno = TURNOS[colega.turno];
     const sentido = colega.sentido === "ida" ? "Ida" : "Volta";
-    const rotuloAcao = confirmado ? "Combinado" : colega.compativel ? "Combinar" : "Outro turno";
+    const pedido = estado.pedidos[colega.id];
+    const aguardando = estado.usuario.papel === "passageiro" && !confirmado && ["pendente", "recusado"].includes(pedido);
+    const rotuloAcao = confirmado ? "Combinado"
+        : aguardando ? (pedido === "pendente" ? "Pendente" : "Recusado")
+        : colega.compativel ? "Combinar" : "Outro turno";
 
     return `
         <li class="${classes}">
@@ -349,7 +427,7 @@ function modeloDaLinha(colega, confirmados) {
             </button>
             <span class="matches__horario">${turno.horarios[colega.sentido]}<small>${sentido} · ${turno.rotulo}</small></span>
             <span class="matches__rateio">${formatarReais(rateioPorPessoa(colega.km, PASSAGEIROS_NA_LISTA))}<small>por pessoa</small></span>
-            <button class="matches__acao" type="button" data-confirmar="${colega.id}" aria-pressed="${confirmado}" ${colega.compativel ? "" : "disabled"}>${rotuloAcao}</button>
+            <button class="matches__acao" type="button" data-confirmar="${colega.id}" aria-pressed="${confirmado}" ${colega.compativel && !aguardando ? "" : "disabled"}>${rotuloAcao}</button>
         </li>`;
 }
 
@@ -371,6 +449,333 @@ function renderizarMatches() {
         : modeloDoVazio();
 }
 
+/* ---------- página de Impacto ---------- */
+
+const NOMES_DAS_SEMANAS = ["Sem. 1", "Sem. 2", "Sem. 3", "Sem. 4 (atual)"];
+
+function caronasConfirmadas() {
+    return totalDeCaronas() - CARONAS_BASE_DO_MES;
+}
+
+function caronasPorSemana() {
+    const semanas = [...HISTORICO_SIMULADO.semanas];
+    semanas[semanas.length - 1] += caronasConfirmadas();
+    return semanas;
+}
+
+function caronasPorTurno() {
+    const turnos = { ...HISTORICO_SIMULADO.turnos };
+    Object.entries(estado.confirmacoes).forEach(([chave, ids]) => {
+        const [, turno] = chave.split("-");
+        turnos[turno] += ids.size;
+    });
+    return turnos;
+}
+
+function economiaPorCarona() {
+    const ida = TARIFA_DO_ONIBUS - rateioPorPessoa(estado.km, estado.pessoas);
+    return Math.max(0, 2 * ida);
+}
+
+function formatarNumero(valor, casas = 1) {
+    return valor.toLocaleString("pt-BR", { maximumFractionDigits: casas });
+}
+
+function premissasDoImpacto() {
+    return [
+        ["Emissão evitada por carona", `${formatarNumero(KG_CO2_POR_CARONA)} kg de CO₂`, "viagem de 8 km, ida e volta, a 0,12 kg por km"],
+        ["Economia por carona", formatarReais(economiaPorCarona()), "ônibus, ida e volta, menos o seu rateio"],
+        ["Tarifa do ônibus", formatarReais(TARIFA_DO_ONIBUS), "Canvas do Problema (TUA)"],
+        ["Meta do mês", `${META_CARONAS_DO_MES} caronas`, "definida pelo projeto"],
+        ["Caronas de base", `${CARONAS_BASE_DO_MES} caronas`, "dados simulados do mês"],
+    ];
+}
+
+function modeloDaColunaDoGrafico(valor, nome, maior) {
+    const proporcao = maior ? valor / maior : 0;
+    return `
+        <li class="grafico__coluna">
+            <span class="grafico__valor">${valor}</span>
+            <span class="grafico__barra"><i data-proporcao="${proporcao}"></i></span>
+            <span class="grafico__rotulo">${nome}</span>
+        </li>`;
+}
+
+function modeloDaPremissa([rotulo, valor, detalhe]) {
+    return `<li class="premissa"><span>${rotulo}<small>${detalhe}</small></span><strong>${valor}</strong></li>`;
+}
+
+function renderizarIndicadores() {
+    const total = totalDeCaronas();
+    const progresso = Math.min(total / META_CARONAS_DO_MES, 1);
+    const faltam = Math.max(META_CARONAS_DO_MES - total, 0);
+
+    $("#imp-caronas").textContent = total;
+    $("#imp-caronas-detalhe").textContent = `${caronasConfirmadas()} combinadas por você`;
+    $("#imp-co2").textContent = `${formatarNumero(total * KG_CO2_POR_CARONA, 0)} kg`;
+    $("#imp-economia").textContent = formatarReais(total * economiaPorCarona());
+    $("#imp-meta").textContent = `${Math.round(progresso * 100)}%`;
+    $("#imp-meta-detalhe").textContent = faltam ? `Faltam ${faltam} para a meta de ${META_CARONAS_DO_MES}` : "Meta do mês atingida";
+    $("#imp-meta-barra").style.setProperty("--proporcao", progresso);
+}
+
+function renderizarGraficos() {
+    const semanas = caronasPorSemana();
+    const maiorSemana = Math.max(...semanas);
+    $("#imp-semanas").innerHTML = semanas.map((valor, indice) => modeloDaColunaDoGrafico(valor, NOMES_DAS_SEMANAS[indice], maiorSemana)).join("");
+
+    const turnos = caronasPorTurno();
+    const maiorTurno = Math.max(...Object.values(turnos));
+    $("#imp-turnos").innerHTML = Object.entries(turnos).map(([turno, valor]) =>
+        modeloDaLinhaDoComparativo({ rotulo: TURNOS[turno].rotulo, valor }, maiorTurno, String)
+    ).join("");
+
+    $$("#imp-semanas [data-proporcao], #imp-turnos [data-proporcao]").forEach(barra => {
+        barra.style.setProperty("--proporcao", barra.dataset.proporcao);
+    });
+}
+
+function renderizarPaginaImpacto() {
+    renderizarIndicadores();
+    renderizarGraficos();
+    $("#imp-premissas").innerHTML = premissasDoImpacto().map(modeloDaPremissa).join("");
+}
+
+/* ---------- página de Rateio ---------- */
+
+const CONTROLES_DA_CALCULADORA = ["km", "pessoas", "dias", "consumo", "preco"];
+const FORMATO_DAS_SAIDAS = {
+    km: valor => `${valor} km`,
+    pessoas: valor => valor,
+    dias: valor => `${valor} dias`,
+    consumo: valor => `${valor} km/L`,
+    preco: valor => formatarReais(valor),
+};
+
+function viagensPorMes() {
+    return estado.dias * SEMANAS_NO_MES * 2;
+}
+
+function valorDoRateioNoMes() {
+    return viagensPorMes() * rateioPorPessoa(estado.km, estado.pessoas);
+}
+
+function co2EvitadoNoMes() {
+    return estado.km * 2 * estado.dias * SEMANAS_NO_MES * KG_CO2_POR_KM;
+}
+
+function comparativoDoUsuario() {
+    if (estado.usuario.papel === "motorista") {
+        const combustivel = custoDaViagem(estado.km) * viagensPorMes();
+        const recebido = valorDoRateioNoMes() * estado.pessoas;
+        return {
+            titulo: "Quanto o combustível pesa",
+            linhas: [
+                { rotulo: "Combustível no mês", valor: combustivel },
+                { rotulo: "Você recebe dos colegas", valor: recebido },
+            ],
+            resumo: `Seu custo no mês cai para ${formatarReais(combustivel - recebido)}.`,
+            nota: "Considera ida e volta nos dias escolhidos, com todas as vagas ocupadas.",
+        };
+    }
+
+    const onibus = viagensPorMes() * TARIFA_DO_ONIBUS;
+    const carona = valorDoRateioNoMes();
+    const diferenca = onibus - carona;
+    return {
+        titulo: "Comparado ao ônibus",
+        linhas: [
+            { rotulo: "Ônibus no mês", valor: onibus },
+            { rotulo: "Carona no mês", valor: carona },
+        ],
+        resumo: diferenca >= 0
+            ? `Você economiza ${formatarReais(diferenca)} por mês.`
+            : `No ColaAí você paga ${formatarReais(-diferenca)} a mais por mês.`,
+        nota: `Ônibus: tarifa de ${formatarReais(TARIFA_DO_ONIBUS)} (Canvas do Problema), ida e volta.`,
+    };
+}
+
+function modeloDaLinhaDoComparativo({ rotulo, valor }, maior, formatar = formatarReais) {
+    const proporcao = maior ? valor / maior : 0;
+    return `
+        <li class="comparativo__linha">
+            <span>${rotulo}</span>
+            <strong>${formatar(valor)}</strong>
+            <span class="comparativo__barra"><i data-proporcao="${proporcao}"></i></span>
+        </li>`;
+}
+
+function combinadosDoUsuario() {
+    return COLEGAS.filter(colega => colega.papel === papelBuscado() && estaAceito(colega));
+}
+
+function modeloDoCombinado(colega) {
+    const turno = TURNOS[colega.turno];
+    const sentido = colega.sentido === "ida" ? "Ida" : "Volta";
+    const valor = rateioPorPessoa(colega.km, PASSAGEIROS_NA_LISTA);
+
+    return `
+        <li class="combinado">
+            <span class="avatar" aria-hidden="true">${iniciais(colega.nome)}</span>
+            <span class="combinado__pessoa">
+                <strong>${colega.nome}</strong>
+                <small>${sentido} · ${turno.rotulo} · ${turno.horarios[colega.sentido]}</small>
+            </span>
+            <strong class="combinado__valor">${formatarReais(valor)}</strong>
+            <button class="combinado__copiar" type="button" data-copiar="${colega.id}" aria-label="Copiar o valor de ${colega.nome}">Copiar</button>
+        </li>`;
+}
+
+function modeloDoSemCombinados() {
+    return `
+        <li class="combinados__vazio">
+            Nenhuma carona combinada ainda.
+            <button class="formulario__link" type="button" data-pagina="matches">Ver matches</button>
+        </li>`;
+}
+
+function renderizarCalculadora() {
+    const rateio = rateioPorPessoa(estado.km, estado.pessoas);
+
+    CONTROLES_DA_CALCULADORA.forEach(chave => {
+        ajustarFaixa($(`#rp-${chave}`), estado[chave]);
+        $(`#rp-saida-${chave}`).textContent = FORMATO_DAS_SAIDAS[chave](estado[chave]);
+    });
+
+    $("#rp-numero").textContent = formatarReais(rateio);
+    $("#rp-detalhe").textContent = `Viagem de ${formatarReais(custoDaViagem(estado.km))} dividida em ${estado.pessoas + 1} pessoas`;
+    $("#rp-mes").textContent = `${formatarReais(valorDoRateioNoMes())} por mês`;
+    $("#rp-mes-detalhe").textContent = `${viagensPorMes()} viagens, ida e volta em ${estado.dias} dias por semana`;
+
+    const partes = ['<span class="rateio__parte rateio__parte--motorista"></span>']
+        .concat(Array.from({ length: estado.pessoas }, () => '<span class="rateio__parte"></span>'));
+    $("#rp-divisao").innerHTML = partes.join("");
+}
+
+function renderizarComparativo() {
+    const comparativo = comparativoDoUsuario();
+    const maior = Math.max(...comparativo.linhas.map(linha => linha.valor));
+
+    $("#comp-titulo").textContent = comparativo.titulo;
+    $("#comp-linhas").innerHTML = comparativo.linhas.map(linha => modeloDaLinhaDoComparativo(linha, maior)).join("");
+    $$("#comp-linhas [data-proporcao]").forEach(barra => barra.style.setProperty("--proporcao", barra.dataset.proporcao));
+    $("#comp-resumo").textContent = comparativo.resumo;
+    $("#comp-nota").textContent = comparativo.nota;
+    $("#comp-co2").textContent = `${Math.round(co2EvitadoNoMes())} kg de CO₂ evitados por mês, com ${KG_CO2_POR_KM.toString().replace(".", ",")} kg por km`;
+}
+
+function renderizarCombinados() {
+    const motorista = estado.usuario.papel === "motorista";
+    const combinados = combinadosDoUsuario();
+    const total = combinados.reduce((soma, colega) => soma + rateioPorPessoa(colega.km, PASSAGEIROS_NA_LISTA), 0);
+
+    $("#combinados-titulo").textContent = motorista ? "Pix dos passageiros" : "Pix para o motorista";
+    $("#combinados-lista").innerHTML = combinados.length ? combinados.map(modeloDoCombinado).join("") : modeloDoSemCombinados();
+    $("#combinados-total").hidden = !motorista || combinados.length < 2;
+    $("#combinados-total-valor").textContent = formatarReais(total);
+}
+
+function renderizarPaginaRateio() {
+    renderizarCalculadora();
+    renderizarComparativo();
+    renderizarCombinados();
+}
+
+async function copiarValor(id) {
+    const valor = rateioPorPessoa(colegaPorId(id).km, PASSAGEIROS_NA_LISTA).toFixed(2).replace(".", ",");
+    try {
+        await navigator.clipboard.writeText(valor);
+        avisar(`Valor copiado: R$ ${valor}`);
+    } catch {
+        avisar(`Não consegui copiar. O valor é R$ ${valor}.`);
+    }
+}
+
+/* ---------- página de Matches ---------- */
+
+const ROTULOS_DO_STATUS = {
+    passageiro: { nenhum: "Disponível", pendente: "Aguardando", aceito: "Aceito", recusado: "Recusado" },
+    motorista: { nenhum: "Disponível", pendente: "Pediu carona", aceito: "Aceito", recusado: "Recusado" },
+};
+
+function linkDoWhatsapp(colega) {
+    const horario = TURNOS[colega.turno].horarios[colega.sentido];
+    const texto = `Oi, ${primeiroNome(colega.nome)}! Combinamos a carona pelo ColaAí (${horario}). Vamos acertar o Pix?`;
+    return `https://wa.me/?text=${encodeURIComponent(texto)}`;
+}
+
+function modeloDasAcoes(colega, status) {
+    const id = colega.id;
+    const motorista = estado.usuario.papel === "motorista";
+    const botao = (atributo, texto, classe) =>
+        `<button class="botao ${classe}" type="button" data-${atributo}="${id}">${texto}</button>`;
+    const whatsapp = `<a class="botao botao--primario" href="${linkDoWhatsapp(colega)}" target="_blank" rel="noopener noreferrer">Chamar no WhatsApp</a>`;
+
+    if (!colega.compativel) return `<button class="botao botao--contorno" type="button" disabled>Outro turno</button>`;
+    if (status === "aceito") return whatsapp + botao("cancelar", motorista ? "Desfazer" : "Cancelar", "botao--contorno");
+    if (motorista) {
+        return status === "recusado"
+            ? botao("aceitar", "Aceitar mesmo assim", "botao--contorno")
+            : botao("aceitar", "Aceitar", "botao--primario") + botao("recusar", "Recusar", "botao--contorno");
+    }
+    if (status === "pendente") return botao("cancelar", "Cancelar pedido", "botao--contorno");
+    return botao("pedir", status === "recusado" ? "Pedir de novo" : "Deixa eu colar!", "botao--primario");
+}
+
+function modeloDoPedido(colega) {
+    const status = statusDoPedido(colega);
+    const motorista = estado.usuario.papel === "motorista";
+    const turno = TURNOS[colega.turno];
+    const sentido = colega.sentido === "ida" ? "Ida" : "Volta";
+    const selo = colega.compativel ? ROTULOS_DO_STATUS[estado.usuario.papel][status] : "Outro turno";
+    const classeDoSelo = colega.compativel ? `pedido__selo--${status}` : "";
+    const classes = ["pedido", `pedido--${status}`, !colega.compativel && "pedido--incompativel"].filter(Boolean).join(" ");
+    const detalheDoCarro = motorista
+        ? `<div><dt>Distância</dt><dd>${colega.km} km</dd></div>`
+        : `<div><dt>Carro</dt><dd>${colega.carro} · ${colega.cor}</dd></div>`;
+    const vagas = motorista ? "" : `<div><dt>Vagas</dt><dd>${colega.vagas} livres</dd></div>`;
+
+    return `
+        <li class="${classes}" data-pedido="${colega.id}">
+            <div class="pedido__topo">
+                <span class="avatar" aria-hidden="true">${iniciais(colega.nome)}</span>
+                <div class="pedido__pessoa">
+                    <strong>${colega.nome}</strong>
+                    <span>${colega.curso}</span>
+                </div>
+                <span class="pedido__selo ${classeDoSelo}">${selo}</span>
+            </div>
+            <dl class="pedido__dados">
+                <div><dt>Horário</dt><dd>${turno.horarios[colega.sentido]} · ${sentido}</dd></div>
+                <div><dt>${colega.sentido === "ida" ? "Destino" : "Saída"}</dt><dd>FATEC</dd></div>
+                ${detalheDoCarro}
+                ${vagas}
+                <div><dt>Rateio</dt><dd>${formatarReais(rateioPorPessoa(colega.km, PASSAGEIROS_NA_LISTA))} por pessoa</dd></div>
+            </dl>
+            <div class="pedido__acoes">${modeloDasAcoes(colega, status)}</div>
+        </li>`;
+}
+
+function renderizarPaginaMatches() {
+    const resumo = resumoDosPedidos();
+    const motorista = estado.usuario.papel === "motorista";
+
+    $("#resumo-pendentes").textContent = resumo.pendente;
+    $("#resumo-aceitos").textContent = resumo.aceito;
+    $("#resumo-recusados").textContent = resumo.recusado;
+    $("#pagina-matches-texto").textContent = motorista
+        ? "Pedidos de carona dos colegas para o seu carro. Aceite quem você puder levar."
+        : "Caronas de colegas até a FATEC. Peça uma e, quando o motorista aceitar, chame no WhatsApp.";
+
+    const lista = colegasDaLista();
+    $("#lista-pedidos").innerHTML = lista.length ? lista.map(modeloDoPedido).join("") : modeloDoVazio();
+}
+
+function fotoDoCarro(nome) {
+    const modelo = nome.toLowerCase();
+    return FOTOS_DOS_CARROS.find(foto => modelo.includes(foto.modelo))?.arquivo ?? null;
+}
+
 function dadosDoCarro() {
     const { usuario } = estado;
     const confirmados = confirmadosDoContexto();
@@ -378,34 +783,50 @@ function dadosDoCarro() {
     if (usuario.papel === "motorista") {
         return {
             nome: usuario.carro,
+            foto: fotoDoCarro(usuario.carro),
+            placa: usuario.placa,
             dono: "Seu carro · você dirige",
             vagasLivres: usuario.vagas - confirmados.size,
         };
     }
 
     const motorista = colegaPorId(estado.selecionadoId);
-    if (!motorista) return { nome: "Sem motorista", dono: "Nenhum motorista nesta busca", vagasLivres: 0 };
+    if (!motorista) return { nome: "Sem motorista", dono: "Nenhum motorista nesta busca", placa: "", vagasLivres: 0 };
 
     return {
         nome: motorista.carro,
+        foto: fotoDoCarro(motorista.carro),
+        placa: motorista.placa,
         dono: `${motorista.cor} · de ${motorista.nome}`,
         vagasLivres: motorista.vagas - (confirmados.has(motorista.id) ? 1 : 0),
     };
+}
+
+function mostrarFotoDoCarro({ nome, foto }) {
+    const imagem = $("#carro-foto");
+
+    if (foto) {
+        imagem.src = `./assets/carros/${foto}`;
+        imagem.alt = nome;
+    }
+    imagem.hidden = !foto;
+    $(".carro__desenho").hidden = Boolean(foto);
+    $(".carro__palco").classList.toggle("carro__palco--foto", Boolean(foto));
 }
 
 function renderizarCarro() {
     const carro = dadosDoCarro();
     $("#carro-nome").textContent = carro.nome;
     $("#carro-dono").textContent = carro.dono;
+    mostrarFotoDoCarro(carro);
 
-    const vagas = [1, 2, 3, 4].map(numero => {
-        const livre = numero <= carro.vagasLivres ? " carro__vaga--livre" : "";
-        return `<span class="carro__vaga${livre}">${numero}</span>`;
-    });
-    const rotulo = `<span class="carro__rotulo-vagas">Vagas</span>`;
-    const vagasDoCarro = $("#carro-vagas");
-    vagasDoCarro.innerHTML = rotulo + vagas.join("");
-    vagasDoCarro.setAttribute("aria-label", `${carro.vagasLivres} vagas livres de 4`);
+    $("#carro-numero").textContent = carro.vagasLivres;
+    $("#carro-vagas").setAttribute("aria-label", `${carro.vagasLivres} vagas livres`);
+
+    const placa = $("#carro-placa");
+    placa.classList.toggle("carro__placa--vazia", !carro.placa);
+    $("#carro-placa-texto").textContent = carro.placa || "Sem placa";
+    placa.setAttribute("aria-label", carro.placa ? `Placa ${carro.placa}` : "Placa não informada");
 }
 
 function montarAssentos() {
@@ -467,11 +888,19 @@ function renderizarRateio() {
         .concat(Array.from({ length: pessoas }, () => '<span class="rateio__parte"></span>'));
     $("#rateio-divisao").innerHTML = partes.join("");
 
-    ["#faixa-km", "#faixa-pessoas"].forEach(seletor => {
-        const faixa = $(seletor);
-        const progresso = ((faixa.value - faixa.min) / (faixa.max - faixa.min)) * 100;
-        faixa.style.setProperty("--progresso", `${progresso}%`);
-    });
+    ajustarFaixa($("#faixa-km"), km);
+    ajustarFaixa($("#faixa-pessoas"), pessoas);
+}
+
+function ajustarFaixa(faixa, valor) {
+    faixa.value = valor;
+    const progresso = ((faixa.value - faixa.min) / (faixa.max - faixa.min)) * 100;
+    faixa.style.setProperty("--progresso", `${progresso}%`);
+}
+
+function renderizarRateios() {
+    renderizarRateio();
+    renderizarPaginaRateio();
 }
 
 function renderizarImpacto() {
@@ -635,6 +1064,12 @@ function avisar(texto) {
 }
 
 function irParaCartao(id, botao) {
+    if (location.hash !== "#painel") {
+        location.hash = "#painel";
+        setTimeout(() => irParaCartao(id, botao), 60);
+        return;
+    }
+
     const cartao = document.getElementById(id);
     cartao.scrollIntoView({ behavior: reduzMovimento() ? "auto" : "smooth", block: "center" });
     cartao.classList.add("cartao--destaque");
@@ -658,6 +1093,49 @@ function selecionarMantendoFoco(id) {
     $(`[data-selecionar="${id}"]`)?.focus();
 }
 
+function pedirCarona(id) {
+    estado.pedidos[id] = "pendente";
+    avisar(`Pedido enviado para ${primeiroNome(colegaPorId(id).nome)}.`);
+    clearTimeout(temporizadoresDosPedidos[id]);
+    temporizadoresDosPedidos[id] = setTimeout(() => responderPedido(id), ATRASO_DA_RESPOSTA_MS);
+}
+
+function responderPedido(id) {
+    if (!estado.usuario || estado.pedidos[id] !== "pendente") return;
+
+    if (COLEGAS_QUE_RECUSAM.includes(id)) {
+        estado.pedidos[id] = "recusado";
+        avisar(`${primeiroNome(colegaPorId(id).nome)} não consegue te levar desta vez.`);
+    } else {
+        alternarConfirmacao(id);
+    }
+    renderizarPainel();
+}
+
+function cancelarPedido(id) {
+    clearTimeout(temporizadoresDosPedidos[id]);
+    if (estaAceito(colegaPorId(id))) alternarConfirmacao(id);
+    else delete estado.pedidos[id];
+}
+
+function aceitarPedido(id) {
+    if (!estaAceito(colegaPorId(id))) alternarConfirmacao(id);
+}
+
+function recusarPedido(id) {
+    estado.pedidos[id] = "recusado";
+}
+
+function agirNoPedido(acao, id) {
+    acao(id);
+    renderizarPainel();
+    $(`[data-pedido="${id}"] .botao`)?.focus();
+}
+
+function abrirPagina(nome) {
+    location.hash = `#${nome}`;
+}
+
 function mudarContexto(mudancas) {
     Object.assign(estado, mudancas);
     renderizarPainel();
@@ -669,6 +1147,12 @@ const acoesDoPainel = {
     filtro: (valor) => mudarContexto({ filtro: valor }),
     selecionar: selecionarMantendoFoco,
     confirmar: confirmarMantendoFoco,
+    pedir: id => agirNoPedido(pedirCarona, id),
+    cancelar: id => agirNoPedido(cancelarPedido, id),
+    aceitar: id => agirNoPedido(aceitarPedido, id),
+    recusar: id => agirNoPedido(recusarPedido, id),
+    pagina: abrirPagina,
+    copiar: copiarValor,
     alvo: irParaCartao,
 };
 
@@ -697,11 +1181,17 @@ function ligarPainel() {
 
     $("#faixa-km").addEventListener("input", evento => {
         estado.km = Number(evento.target.value);
-        renderizarRateio();
+        renderizarRateios();
     });
     $("#faixa-pessoas").addEventListener("input", evento => {
         estado.pessoas = Number(evento.target.value);
-        renderizarRateio();
+        renderizarRateios();
+    });
+    CONTROLES_DA_CALCULADORA.forEach(chave => {
+        $(`#rp-${chave}`).addEventListener("input", evento => {
+            estado[chave] = Number(evento.target.value);
+            renderizarRateios();
+        });
     });
 }
 

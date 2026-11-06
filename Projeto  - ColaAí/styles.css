@@ -7,6 +7,9 @@
 @import url("styles/grade.css");
 @import url("styles/hubs.css");
 @import url("styles/matches.css");
+@import url("styles/pagina-matches.css");
+@import url("styles/pagina-rateio.css");
+@import url("styles/pagina-impacto.css");
 @import url("styles/modo.css");
 @import url("styles/turnos.css");
 @import url("styles/rateio.css");
@@ -14,6 +17,7 @@
 @import url("styles/carro.css");
 @import url("styles/impacto.css");
 @import url("styles/movimento.css");
+@import url("styles/conexao.css");
 
 :root {
     --preto:#0A0908;

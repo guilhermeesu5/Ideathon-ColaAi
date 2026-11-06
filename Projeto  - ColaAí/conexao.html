@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="noindex">
+        <title>ColaAí · Conexão com o banco</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="reset.css">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body class="conexao">
+        <main class="conexao__cartao">
+            <h1 class="conexao__titulo">Conexão com o banco</h1>
+            <p class="conexao__texto">Cole a chave <strong>anon / publishable</strong> do Supabase. Ela fica só neste navegador e não vai para nenhum arquivo.</p>
+
+            <form class="conexao__formulario" id="formulario-chave" autocomplete="off">
+                <label class="conexao__rotulo" for="campo-chave">Chave anon</label>
+                <input class="conexao__campo" id="campo-chave" type="password" spellcheck="false" autocomplete="off" required>
+                <div class="conexao__acoes">
+                    <button class="conexao__botao" type="submit">Salvar e testar</button>
+                    <button class="conexao__botao conexao__botao--leve" type="button" id="botao-apagar">Apagar chave</button>
+                </div>
+            </form>
+
+            <p class="conexao__estado" id="estado" role="status"></p>
+            <ul class="conexao__tabelas" id="tabelas"></ul>
+        </main>
+        <script src="supabase-config.js"></script>
+        <script src="conexao.js"></script>
+    </body>
+</html>

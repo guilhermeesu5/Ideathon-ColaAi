@@ -72,8 +72,8 @@
     }
 
     .lateral__imagem{
-        width: 2rem;
-        height: 2rem;
+        width: 1.75rem;
+        height: auto;
     }
 
     .lateral__nav{

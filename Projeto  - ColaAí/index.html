@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-br" data-tema="claro">
-
-<!--HEAD-->
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="ColaAí: caronas colaborativas entre alunos e professores da FATEC Araçatuba, com e-mail institucional, hub fixo de encontro e rateio via Pix.">
+        <link rel="icon" type="image/png" href="./assets/favicon.png">
         <link rel="stylesheet" href="reset.css">
         <link rel="stylesheet" href="styles.css">
 
@@ -67,8 +66,7 @@
 
                     <header class="acesso__topo">
                         <a href="#entrar" class="marca">
-                            <span class="marca__selo"><img src="./assets/Logo.svg" alt="" class="marca__imagem"></span>
-                            <span class="marca__nome">Cola<b>Aí</b></span>
+                            <img src="./assets/Logo-ColaAi.png" alt="ColaAí" class="marca__logo">
                         </a>
 
                         <div class="segmento" role="group" aria-label="Tema da página">
@@ -155,8 +153,14 @@
                         <div class="formulario__dados-carro" id="dados-carro" hidden>
                             <div class="campo">
                                 <label class="campo__rotulo" for="cadastro-carro">Modelo do carro</label>
-                                <input class="campo__entrada" id="cadastro-carro" name="carro" type="text" placeholder="Ex.: Fiat Argo prata" data-regra="carro" aria-describedby="cadastro-carro-erro">
+                                <input class="campo__entrada" id="cadastro-carro" name="carro" type="text" placeholder="Ex.: Honda Civic branco" data-regra="carro" aria-describedby="cadastro-carro-erro">
                                 <p class="campo__erro" id="cadastro-carro-erro" role="alert"></p>
+                            </div>
+
+                            <div class="campo">
+                                <label class="campo__rotulo" for="cadastro-placa">Placa</label>
+                                <input class="campo__entrada" id="cadastro-placa" name="placa" type="text" maxlength="8" autocapitalize="characters" autocomplete="off" placeholder="ABC1D23" data-regra="placa" aria-describedby="cadastro-placa-erro">
+                                <p class="campo__erro" id="cadastro-placa-erro" role="alert"></p>
                             </div>
 
                             <fieldset class="campo">
@@ -281,20 +285,20 @@
 
             <aside class="lateral">
                 <a href="#painel" class="lateral__marca" aria-label="ColaAí">
-                    <img src="./assets/Logo.svg" alt="" class="lateral__imagem">
+                    <img src="./assets/Logo-Marca.png" alt="" class="lateral__imagem">
                 </a>
 
                 <nav class="lateral__nav" aria-label="Seções do painel">
-                    <button class="lateral__botao lateral__botao--ativo" type="button" data-alvo="cartao-hubs" aria-label="Hubs">
-                        <svg class="icone"><use href="#icone-pino"/></svg>
+                    <button class="lateral__botao lateral__botao--ativo" type="button" data-pagina="painel" aria-label="Painel">
+                        <svg class="icone"><use href="#icone-painel"/></svg>
                     </button>
-                    <button class="lateral__botao" type="button" data-alvo="cartao-matches" aria-label="Matches">
+                    <button class="lateral__botao" type="button" data-pagina="matches" aria-label="Matches">
                         <svg class="icone"><use href="#icone-usuarios"/></svg>
                     </button>
-                    <button class="lateral__botao" type="button" data-alvo="cartao-rateio" aria-label="Rateio">
+                    <button class="lateral__botao" type="button" data-pagina="rateio" aria-label="Rateio">
                         <svg class="icone"><use href="#icone-carteira"/></svg>
                     </button>
-                    <button class="lateral__botao" type="button" data-alvo="cartao-impacto" aria-label="Impacto">
+                    <button class="lateral__botao" type="button" data-pagina="impacto" aria-label="Impacto">
                         <svg class="icone"><use href="#icone-folha"/></svg>
                     </button>
                 </nav>
@@ -329,7 +333,7 @@
                     </div>
                 </header>
 
-                <div class="grade">
+                <div class="grade" id="grade-painel">
 
                     <!-- cards esq -->
                     <div class="coluna">
@@ -423,6 +427,10 @@
                         <section class="cartao cartao--rateio" id="cartao-rateio" aria-labelledby="rateio-titulo">
                             <div class="cartao__cabecalho">
                                 <h2 class="cartao__titulo" id="rateio-titulo">Rateio da viagem</h2>
+                                <button class="mini__link" type="button" data-pagina="rateio">
+                                    Detalhes
+                                    <svg class="icone"><use href="#icone-seta"/></svg>
+                                </button>
                             </div>
 
                             <div class="rateio__valor" aria-live="polite">
@@ -458,8 +466,8 @@
                                 <span class="carro__etiqueta">Dados simulados</span>
                             </div>
 
-                            <!-- A ia q fez isso daqui mas vou trocar por imagens -->
                             <div class="carro__palco">
+                                <img class="carro__foto" id="carro-foto" alt="" hidden>
                                 <svg class="carro__desenho" viewBox="0 0 470 190" role="img" aria-label="Ilustração de um sedan visto de lado">
                                     <path class="desenho__chao" d="M20 178 H450"/>
                                     <path class="desenho__carroceria" d="M34 148 L34 126 C34 118 40 114 50 112 L104 106 C120 104 128 96 142 84 C154 74 170 68 192 66 L270 66 C298 66 322 80 346 102 L398 108 C420 110 438 120 440 136 L440 148 L378 148 A30 30 0 0 0 318 148 L148 148 A30 30 0 0 0 88 148 Z"/>
@@ -478,14 +486,28 @@
                             <h3 class="carro__nome" id="carro-nome">Fiat Argo</h3>
                             <p class="carro__dono" id="carro-dono">Selecione um motorista</p>
 
-                            <div class="carro__vagas" role="img" aria-label="Vagas livres" id="carro-vagas">
-                                <span class="carro__rotulo-vagas">Vagas</span>
+                            <div class="carro__detalhes">
+                                <div class="carro__vagas" id="carro-vagas" role="img">
+                                    <span class="rotulo">Vagas livres</span>
+                                    <strong class="carro__numero" id="carro-numero">0</strong>
+                                </div>
+
+                                <div class="carro__placa" id="carro-placa" role="img">
+                                    <span class="carro__placa-faixa">Brasil</span>
+                                    <strong class="carro__placa-texto" id="carro-placa-texto">---</strong>
+                                </div>
                             </div>
 
                         </section>
 
                         <section class="mini impacto" id="cartao-impacto" aria-labelledby="impacto-titulo">
-                            <h3 class="mini__titulo" id="impacto-titulo">Impacto</h3>
+                            <div class="mini__cabecalho">
+                                <h3 class="mini__titulo" id="impacto-titulo">Impacto</h3>
+                                <button class="mini__link" type="button" data-pagina="impacto">
+                                    Detalhes
+                                    <svg class="icone"><use href="#icone-seta"/></svg>
+                                </button>
+                            </div>
                             <div class="impacto__corpo">
                                 <div class="bateria" id="impacto-bateria" role="img" aria-label="Progresso da meta mensal de caronas">
                                     <span class="bateria__nivel"><svg class="icone"><use href="#icone-folha"/></svg></span>
@@ -551,6 +573,193 @@
                     </div>
 
                 </div>
+
+                <section class="pagina pagina-matches" id="pagina-matches" aria-labelledby="pagina-matches-titulo" hidden>
+
+                    <header class="pagina__cabecalho">
+                        <div>
+                            <h1 class="pagina__titulo" id="pagina-matches-titulo">Matches</h1>
+                            <p class="pagina__texto" id="pagina-matches-texto"></p>
+                        </div>
+
+                        <ul class="resumo" aria-label="Resumo dos pedidos">
+                            <li class="resumo__item"><strong id="resumo-pendentes">0</strong>Pendentes</li>
+                            <li class="resumo__item resumo__item--aceito"><strong id="resumo-aceitos">0</strong>Aceitos</li>
+                            <li class="resumo__item"><strong id="resumo-recusados">0</strong>Recusados</li>
+                        </ul>
+                    </header>
+
+                    <div class="pagina-matches__filtros">
+                        <div class="segmento" role="group" aria-label="Filtro da lista">
+                            <button class="segmento__botao" type="button" data-filtro="compativeis" aria-pressed="true">Compatíveis</button>
+                            <button class="segmento__botao" type="button" data-filtro="todos" aria-pressed="false">Todos</button>
+                        </div>
+
+                        <div class="segmento" role="group" aria-label="Sentido da viagem">
+                            <button class="segmento__botao" type="button" data-sentido="ida" aria-pressed="true">Ida</button>
+                            <button class="segmento__botao" type="button" data-sentido="volta" aria-pressed="false">Volta</button>
+                        </div>
+
+                        <div class="segmento" role="group" aria-label="Turno">
+                            <button class="segmento__botao" type="button" data-turno="manha" aria-pressed="true">Manhã</button>
+                            <button class="segmento__botao" type="button" data-turno="tarde" aria-pressed="false">Tarde</button>
+                            <button class="segmento__botao" type="button" data-turno="noite" aria-pressed="false">Noite</button>
+                        </div>
+                    </div>
+
+                    <ul class="pedidos" id="lista-pedidos" aria-live="polite"></ul>
+                </section>
+
+                <section class="pagina pagina-rateio" id="pagina-rateio" aria-labelledby="pagina-rateio-titulo" hidden>
+
+                    <header class="pagina__cabecalho">
+                        <div>
+                            <h1 class="pagina__titulo" id="pagina-rateio-titulo">Rateio</h1>
+                            <p class="pagina__texto">Veja quanto cada pessoa paga pela carona, quanto isso pesa no mês e quanto vai no Pix. O ColaAí só estima o valor: o pagamento é entre vocês, sem taxa.</p>
+                        </div>
+                    </header>
+
+                    <div class="pagina-rateio__corpo">
+
+                        <section class="cartao calculadora" aria-labelledby="calculadora-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="calculadora-titulo">Calculadora da viagem</h2>
+                            </div>
+
+                            <div class="calculadora__resultado" aria-live="polite">
+                                <span class="rotulo">Por pessoa, por viagem</span>
+                                <span class="rateio__numero" id="rp-numero">R$ 0,00</span>
+                                <p class="rateio__detalhe" id="rp-detalhe"></p>
+                            </div>
+
+                            <div class="rateio__divisao" id="rp-divisao" aria-hidden="true"></div>
+
+                            <div class="calculadora__mes">
+                                <strong id="rp-mes">R$ 0,00 por mês</strong>
+                                <span id="rp-mes-detalhe"></span>
+                            </div>
+
+                            <label class="calculadora__controle">
+                                <span>Distância</span>
+                                <input class="rateio__faixa" id="rp-km" type="range" min="2" max="30" step="1">
+                                <output class="rateio__saida" id="rp-saida-km" for="rp-km"></output>
+                            </label>
+                            <label class="calculadora__controle">
+                                <span>Caronas</span>
+                                <input class="rateio__faixa" id="rp-pessoas" type="range" min="1" max="4" step="1">
+                                <output class="rateio__saida" id="rp-saida-pessoas" for="rp-pessoas"></output>
+                            </label>
+                            <label class="calculadora__controle">
+                                <span>Dias na semana</span>
+                                <input class="rateio__faixa" id="rp-dias" type="range" min="1" max="5" step="1">
+                                <output class="rateio__saida" id="rp-saida-dias" for="rp-dias"></output>
+                            </label>
+                            <label class="calculadora__controle">
+                                <span>Consumo</span>
+                                <input class="rateio__faixa" id="rp-consumo" type="range" min="8" max="16" step="1">
+                                <output class="rateio__saida" id="rp-saida-consumo" for="rp-consumo"></output>
+                            </label>
+                            <label class="calculadora__controle">
+                                <span>Litro</span>
+                                <input class="rateio__faixa" id="rp-preco" type="range" min="5" max="8" step="0.1">
+                                <output class="rateio__saida" id="rp-saida-preco" for="rp-preco"></output>
+                            </label>
+
+                            <p class="calculadora__nota">Consumo e preço do litro são premissas provisórias do protótipo. Antes da apresentação, troque por dados da ANP e do Inmetro.</p>
+                        </section>
+
+                        <div class="pagina-rateio__lateral">
+
+                            <section class="cartao comparativo" aria-labelledby="comp-titulo">
+                                <div class="cartao__cabecalho">
+                                    <h2 class="cartao__titulo" id="comp-titulo"></h2>
+                                </div>
+
+                                <ul class="comparativo__linhas" id="comp-linhas"></ul>
+                                <p class="comparativo__resumo" id="comp-resumo" aria-live="polite"></p>
+                                <p class="comparativo__nota" id="comp-nota"></p>
+                                <p class="comparativo__nota" id="comp-co2"></p>
+                            </section>
+
+                            <section class="cartao combinados" aria-labelledby="combinados-titulo">
+                                <div class="cartao__cabecalho">
+                                    <h2 class="cartao__titulo" id="combinados-titulo"></h2>
+                                </div>
+
+                                <ul class="combinados__lista" id="combinados-lista" aria-live="polite"></ul>
+
+                                <p class="combinados__total" id="combinados-total" hidden>
+                                    <span>Total a receber por viagem</span>
+                                    <strong id="combinados-total-valor"></strong>
+                                </p>
+                            </section>
+
+                        </div>
+                    </div>
+                </section>
+
+                <section class="pagina pagina-impacto" id="pagina-impacto" aria-labelledby="pagina-impacto-titulo" hidden>
+
+                    <header class="pagina__cabecalho">
+                        <div>
+                            <h1 class="pagina__titulo" id="pagina-impacto-titulo">Impacto</h1>
+                            <p class="pagina__texto">O que as caronas do mês representam para os alunos e para a cidade. Os números mudam conforme você combina caronas e são estimativas feitas com dados simulados.</p>
+                        </div>
+                    </header>
+
+                    <div class="pagina-impacto__corpo">
+
+                        <ul class="indicadores" aria-label="Indicadores do mês">
+                            <li class="indicador">
+                                <span class="rotulo">Caronas no mês</span>
+                                <strong class="indicador__valor" id="imp-caronas">0</strong>
+                                <span class="indicador__detalhe" id="imp-caronas-detalhe"></span>
+                            </li>
+                            <li class="indicador">
+                                <span class="rotulo">CO₂ evitado</span>
+                                <strong class="indicador__valor" id="imp-co2">0 kg</strong>
+                                <span class="indicador__detalhe">menos gases de efeito estufa</span>
+                            </li>
+                            <li class="indicador">
+                                <span class="rotulo">Economia dos alunos</span>
+                                <strong class="indicador__valor" id="imp-economia">R$ 0,00</strong>
+                                <span class="indicador__detalhe">em relação ao ônibus</span>
+                            </li>
+                            <li class="indicador indicador--meta">
+                                <span class="rotulo">Meta do mês</span>
+                                <strong class="indicador__valor" id="imp-meta">0%</strong>
+                                <span class="indicador__barra"><i id="imp-meta-barra"></i></span>
+                                <span class="indicador__detalhe" id="imp-meta-detalhe"></span>
+                            </li>
+                        </ul>
+
+                        <section class="cartao grafico" aria-labelledby="grafico-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="grafico-titulo">Caronas por semana</h2>
+                            </div>
+                            <ul class="grafico__colunas" id="imp-semanas"></ul>
+                            <p class="comparativo__nota">Semanas anteriores simuladas. A semana atual inclui o que você combinou.</p>
+                        </section>
+
+                        <div class="pagina-impacto__lateral">
+
+                            <section class="cartao" aria-labelledby="turnos-impacto-titulo">
+                                <div class="cartao__cabecalho">
+                                    <h2 class="cartao__titulo" id="turnos-impacto-titulo">Caronas por turno</h2>
+                                </div>
+                                <ul class="comparativo__linhas" id="imp-turnos"></ul>
+                            </section>
+
+                            <section class="cartao" aria-labelledby="premissas-titulo">
+                                <div class="cartao__cabecalho">
+                                    <h2 class="cartao__titulo" id="premissas-titulo">Como calculamos</h2>
+                                </div>
+                                <ul class="premissas" id="imp-premissas"></ul>
+                            </section>
+
+                        </div>
+                    </div>
+                </section>
 
                 <p class="rodape-painel">
                     ColaAí · protótipo para o Ideathon. CNH, perfis e rotas simulados, sem GPS e sem pagamento dentro do app.

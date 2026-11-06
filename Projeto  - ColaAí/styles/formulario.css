@@ -331,3 +331,7 @@
         display: grid;
     }
 }
+
+.formulario__dados-carro fieldset{
+    grid-column: 1 / -1;
+}

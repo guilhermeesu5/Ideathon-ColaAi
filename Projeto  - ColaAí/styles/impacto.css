@@ -7,6 +7,13 @@
     border-radius: 1.125rem;
 }
 
+.mini__cabecalho{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
 .mini__titulo{
     font-size: 0.875rem;
     font-weight: 500;
