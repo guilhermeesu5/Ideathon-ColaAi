@@ -1194,6 +1194,40 @@ function ligarPainel() {
         });
     });
 }
+/* ---------- integração Click to Chat do WhatsApp ---------- */
+
+function abrirWhatsApp(id) {
+    const colega = colegaPorId(id);
+
+    if (!colega) {
+        avisar("Colega não encontrado.");
+        return;
+    }
+
+    // Configure o contato de cada colega no arquivo dados.js.
+    const numero = String(colega.whatsapp || "").replace(/\D/g, "");
+
+    if (!/^55\d{10,11}$/.test(numero)) {
+        avisar("Cadastre um WhatsApp válido para este colega no arquivo dados.js.");
+        return;
+    }
+
+    const horario = TURNOS[colega.turno].horarios[colega.sentido];
+    const trajeto = colega.sentido === "ida"
+        ? "para a FATEC Araçatuba"
+        : "saindo da FATEC Araçatuba";
+
+    const mensagem = `Olá, ${primeiroNome(colega.nome)}! ` +
+        `Vi seu perfil no ColaAí e gostaria de combinar ` +
+        `uma carona ${trajeto}, às ${horario}.`;
+
+    const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`; //linha da api
+    window.open(url, "_blank", "noopener,noreferrer");
+}
+
+function confirmarMantendoFoco(id) {
+    abrirWhatsApp(id);
+}
 
 /* ---------- início ---------- */
 

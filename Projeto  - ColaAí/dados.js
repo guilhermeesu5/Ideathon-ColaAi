@@ -11,21 +11,21 @@ const TURNOS = {
 };
 
 const COLEGAS = [
-    { id: "lucas",    nome: "Lucas Moreira",   curso: "ADS · 3º sem",            papel: "motorista",  turno: "manha", sentido: "ida",   carro: "Fiat Argo",       cor: "Branco", placa: "FTC1A23",    vagas: 3, km: 7 },
-    { id: "marina",   nome: "Marina Duarte",   curso: "Gestão Empresarial · 5º", papel: "motorista",  turno: "manha", sentido: "ida",   carro: "Volkswagen Polo", cor: "Prata", placa: "FTC2B34",   vagas: 2, km: 5 },
-    { id: "rafael",   nome: "Rafael Nogueira", curso: "ADS · 6º sem",            papel: "motorista",  turno: "tarde", sentido: "ida",   carro: "Chevrolet Onix",  cor: "Prata", placa: "FTC3C45",    vagas: 3, km: 9 },
-    { id: "beatriz",  nome: "Guilherme Almeida", curso: "Big Data no Agro · 2º",   papel: "motorista",  turno: "noite", sentido: "ida",   carro: "Chevrolet Onix",  cor: "Prata", placa: "FTC4D56",    vagas: 2, km: 6 },
-    { id: "pedro",    nome: "Pedro Valença",   curso: "ADS · 4º sem",            papel: "motorista",  turno: "noite", sentido: "ida",   carro: "Fiat Argo",       cor: "Branco", placa: "FTC5E67",  vagas: 1, km: 11 },
-    { id: "camila",   nome: "Camila Rocha",    curso: "Gestão Empresarial · 3º", papel: "motorista",  turno: "noite", sentido: "volta", carro: "Volkswagen Polo", cor: "Prata", placa: "FTC6F78",    vagas: 3, km: 8 },
-    { id: "diego",    nome: "Diego Fontes",    curso: "ADS · 5º sem",            papel: "motorista",  turno: "manha", sentido: "volta", carro: "Chevrolet Onix",  cor: "Prata", placa: "FTC7G89",     vagas: 3, km: 10 },
+   { id: "lucas",    nome: "Lucas Moreira",   curso: "ADS · 3º sem",            papel: "motorista",  turno: "manha", sentido: "ida",   carro: "Fiat Argo",       cor: "Prata",    vagas: 3, km: 7, whatsapp: "5518996028780" },
+    { id: "marina",   nome: "Marina Duarte",   curso: "Gestão Empresarial · 5º", papel: "motorista",  turno: "manha", sentido: "ida",   carro: "Hyundai HB20",    cor: "Branco",   vagas: 2, km: 5, whatsapp: "" },
+    { id: "rafael",   nome: "Rafael Nogueira", curso: "ADS · 6º sem",            papel: "motorista",  turno: "tarde", sentido: "ida",   carro: "VW Gol",          cor: "Preto",    vagas: 3, km: 9, whatsapp: "" },
+    { id: "beatriz",  nome: "Beatriz Salles",  curso: "Big Data no Agro · 2º",   papel: "motorista",  turno: "noite", sentido: "ida",   carro: "Chevrolet Onix",  cor: "Cinza",    vagas: 2, km: 6, whatsapp: "" },
+    { id: "pedro",    nome: "Pedro Valença",   curso: "ADS · 4º sem",            papel: "motorista",  turno: "noite", sentido: "ida",   carro: "Renault Kwid",    cor: "Laranja",  vagas: 1, km: 11, whatsapp: "" },
+    { id: "camila",   nome: "Camila Rocha",    curso: "Gestão Empresarial · 3º", papel: "motorista",  turno: "noite", sentido: "volta", carro: "Toyota Etios",    cor: "Prata",    vagas: 3, km: 8, whatsapp: "" },
+    { id: "diego",    nome: "Diego Fontes",    curso: "ADS · 5º sem",            papel: "motorista",  turno: "manha", sentido: "volta", carro: "Honda Fit",       cor: "Azul",     vagas: 3, km: 10, whatsapp: "" },
 
-    { id: "ana",      nome: "Ana Clara Lima",  curso: "ADS · 1º sem",            papel: "passageiro", turno: "manha", sentido: "ida",   km: 6 },
-    { id: "joao",     nome: "João Vitor Prado", curso: "Gestão Empresarial · 2º", papel: "passageiro", turno: "manha", sentido: "ida",   km: 9 },
-    { id: "larissa",  nome: "Larissa Mendes",  curso: "Big Data no Agro · 4º",   papel: "passageiro", turno: "tarde", sentido: "ida",   km: 4 },
-    { id: "mateus",   nome: "Mateus Aguiar",   curso: "ADS · 6º sem",            papel: "passageiro", turno: "noite", sentido: "ida",   km: 8 },
-    { id: "sofia",    nome: "Sofia Brandão",   curso: "Gestão Empresarial · 1º", papel: "passageiro", turno: "noite", sentido: "ida",   km: 5 },
-    { id: "gabriel",  nome: "Gabriel Tanaka",  curso: "ADS · 2º sem",            papel: "passageiro", turno: "noite", sentido: "volta", km: 7 },
-    { id: "helena",   nome: "Helena Queiroz",  curso: "Big Data no Agro · 3º",   papel: "passageiro", turno: "manha", sentido: "volta", km: 6 },
+    { id: "ana",      nome: "Ana Clara Lima",  curso: "ADS · 1º sem",            papel: "passageiro", turno: "manha", sentido: "ida",   km: 6, whatsapp: "" },
+    { id: "joao",     nome: "João Vitor Prado", curso: "Gestão Empresarial · 2º", papel: "passageiro", turno: "manha", sentido: "ida",   km: 9, whatsapp: "" },
+    { id: "larissa",  nome: "Larissa Mendes",  curso: "Big Data no Agro · 4º",   papel: "passageiro", turno: "tarde", sentido: "ida",   km: 4, whatsapp: "" },
+    { id: "mateus",   nome: "Mateus Aguiar",   curso: "ADS · 6º sem",            papel: "passageiro", turno: "noite", sentido: "ida",   km: 8, whatsapp: "" },
+    { id: "sofia",    nome: "Sofia Brandão",   curso: "Gestão Empresarial · 1º", papel: "passageiro", turno: "noite", sentido: "ida",   km: 5, whatsapp: "" },
+    { id: "gabriel",  nome: "Gabriel Tanaka",  curso: "ADS · 2º sem",            papel: "passageiro", turno: "noite", sentido: "volta", km: 7, whatsapp: "" },
+    { id: "helena",   nome: "Helena Queiroz",  curso: "Big Data no Agro · 3º",   papel: "passageiro", turno: "manha", sentido: "volta", km: 6, whatsapp: "" },
 ];
 
 /* Coordenadas reais de Araçatuba (OpenStreetMap). */
