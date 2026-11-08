@@ -1,0 +1,149 @@
+.mini{
+    display: flex;
+    flex-direction: column;
+    padding: 0.8125rem;
+    background-color: var(--cartao);
+    border: 1px solid var(--borda);
+    border-radius: 1.125rem;
+}
+
+.mini__cabecalho{
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.mini__titulo{
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.mini__link{
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    align-self: flex-start;
+    margin-top: 2px;
+    font-size: 0.6875rem;
+    color: var(--texto-suave);
+}
+
+.mini__link:hover{
+    color: var(--destaque-texto);
+}
+
+.hub{
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.hub__marca{
+    position: relative;
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 6.5rem;
+    height: 3.75rem;
+}
+
+.hub__anel{
+    position: absolute;
+    border: 1px solid var(--destaque-texto);
+    border-radius: 50%;
+    opacity: 0.35;
+}
+
+.hub__anel--1{ width: 2.25rem; height: 2.25rem; }
+.hub__anel--2{ width: 3.25rem; height: 3.25rem; opacity: 0.2; }
+.hub__anel--3{ width: 4.25rem; height: 4.25rem; opacity: 0.1; }
+
+.hub__ponto{
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    background-color: var(--destaque);
+    border-radius: 50%;
+    color: var(--branco);
+    font-size: 0.9375rem;
+}
+
+.hub__ponto::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--destaque-texto);
+    border-radius: 50%;
+    animation: pulsar 2.4s ease-out infinite;
+}
+
+.impacto__corpo{
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.6875rem;
+    margin-top: 0.375rem;
+}
+
+.bateria{
+    position: relative;
+    flex-shrink: 0;
+    width: 2.3125rem;
+    height: 5.1875rem;
+    padding: 0.25rem;
+    border: 2px solid var(--borda);
+    border-radius: 0.8125rem;
+}
+
+.bateria::before{
+    content: "";
+    position: absolute;
+    top: -0.4375rem;
+    left: 50%;
+    width: 0.875rem;
+    height: 0.25rem;
+    background-color: var(--borda);
+    border-radius: 2px 2px 0 0;
+    transform: translateX(-50%);
+}
+
+.bateria__nivel{
+    position: absolute;
+    inset: 0.25rem;
+    display: grid;
+    place-items: center;
+    background-color: var(--destaque);
+    border-radius: 0.5rem;
+    color: var(--branco);
+    font-size: 0.9375rem;
+    clip-path: inset(calc((1 - var(--nivel, 0.5)) * 100%) 0 0 0 round 0.5rem);
+    transition: clip-path 900ms var(--curva-suave);
+}
+
+.impacto__dados{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.impacto__numero{
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.impacto__legenda{
+    display: block;
+    white-space: nowrap;
+    font-size: 0.6875rem;
+    line-height: 1.2;
+    color: var(--texto-suave);
+}

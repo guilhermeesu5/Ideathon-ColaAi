@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-tema="claro">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="ColaAí: caronas colaborativas entre alunos e professores da FATEC Araçatuba, com e-mail institucional, hub fixo de encontro e rateio via Pix.">
+        <link rel="icon" type="image/png" href="./assets/favicon.png">
+        <link rel="stylesheet" href="reset.css">
+        <link rel="stylesheet" href="styles.css">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+        <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" integrity="sha384-MinO0mNliZ3vwppuPOUnGa+iq619pfMhLVUXfC4LHwSCvF9H+6P/KO4Q7qBOYV5V" crossorigin="">
+        <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js" integrity="sha384-SYKAG6cglRMN0RVvhNeBY0r3FYKNOJtznwA0v7B5Vp9tr31xAHsZC0DqkQ/pZDmj" crossorigin=""></script>
+
+        <title>ColaAí · Caronas entre colegas da FATEC Araçatuba</title>
+    </head>
+    <body>
+
+        <!-- Esses icones a IA q fez -->
+        <svg class="sprite" aria-hidden="true" focusable="false">
+            <symbol id="icone-seta" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+            <symbol id="icone-nascer" viewBox="0 0 24 24"><path d="M12 2v8M4.93 10.93l1.41 1.41M2 18h2M20 18h2M19.07 10.93l-1.41 1.41M22 22H2M8 6l4-4 4 4M16 18a4 4 0 0 0-8 0"/></symbol>
+            <symbol id="icone-sol" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+            <symbol id="icone-lua" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+            <symbol id="icone-pino" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+            <symbol id="icone-carro" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2M9 17h6"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></symbol>
+            <symbol id="icone-usuarios" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/><circle cx="9" cy="7" r="4"/></symbol>
+            <symbol id="icone-folha" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10ZM2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></symbol>
+            <symbol id="icone-sair" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+            <symbol id="icone-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+            <symbol id="icone-escudo" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1ZM9 12l2 2 4-4"/></symbol>
+            <symbol id="icone-carteira" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+            <symbol id="icone-casa" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+            <symbol id="icone-sino" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+            <symbol id="icone-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+            <symbol id="icone-olho" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol>
+            <symbol id="icone-olho-fechado" viewBox="0 0 24 24"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49M14.084 14.158a3 3 0 0 1-4.242-4.242M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143M2 2l20 20"/></symbol>
+            <symbol id="icone-painel" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+        </svg>
+
+       
+        <main class="acesso" id="tela-acesso">
+
+            <div class="acesso__fundo" aria-hidden="true">
+                <svg viewBox="0 0 1440 700" preserveAspectRatio="xMidYMax slice">
+                    <defs>
+                        <linearGradient id="degrade-fundo" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="currentColor" stop-opacity="0.14"/>
+                            <stop offset="1" stop-color="currentColor" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    <path class="fundo__area" fill="url(#degrade-fundo)" d="M-20 640 C200 640 260 540 420 540 S700 620 860 520 S1150 400 1280 320 S1400 260 1480 220 V700 H-20 Z"/>
+                    <path class="fundo__rota" pathLength="1" d="M-20 640 C200 640 260 540 420 540 S700 620 860 520 S1150 400 1280 320 S1400 260 1480 220"/>
+                    <circle class="fundo__no" cx="420" cy="540" r="9"/>
+                    <circle class="fundo__no" cx="860" cy="520" r="9"/>
+                    <circle class="fundo__no fundo__no--ativo" cx="1280" cy="320" r="12"/>
+                </svg>
+            </div>
+
+            <div class="acesso__cartao">
+
+                <section class="acesso__formulario">
+
+                    <header class="acesso__topo">
+                        <a href="#entrar" class="marca">
+                            <img src="./assets/Logo-ColaAi.png" alt="ColaAí" class="marca__logo">
+                        </a>
+
+                        <div class="segmento" role="group" aria-label="Tema da página">
+                            <button class="segmento__botao" type="button" data-tema-botao="claro" aria-pressed="true">Claro</button>
+                            <button class="segmento__botao" type="button" data-tema-botao="escuro" aria-pressed="false">Escuro</button>
+                        </div>
+                    </header>
+
+                    <form class="formulario" id="formulario-entrar" data-formulario="entrar" novalidate>
+
+                        <p class="formulario__eyebrow">Área do aluno</p>
+                        <h1 class="formulario__titulo">Entre na sua <em>conta.</em></h1>
+                        <p class="formulario__texto">Veja quem vai no seu turno e combine a carona.</p>
+
+                        <div class="campo">
+                            <label class="campo__rotulo" for="entrar-email">E-mail institucional</label>
+                            <input class="campo__entrada" id="entrar-email" name="email" type="email" autocomplete="email" placeholder="nome@aluno.cps.sp.gov.br" data-regra="email" aria-describedby="entrar-email-erro">
+                            <p class="campo__erro" id="entrar-email-erro" role="alert"></p>
+                        </div>
+
+                        <div class="campo">
+                            <label class="campo__rotulo" for="entrar-senha">Senha</label>
+                            <input class="campo__entrada" id="entrar-senha" name="senha" type="password" autocomplete="current-password" placeholder="Digite sua senha" data-regra="senha" aria-describedby="entrar-senha-erro">
+                            <button class="campo__mostrar" type="button" data-mostrar-senha="entrar-senha" aria-label="Mostrar senha" aria-pressed="false"><svg class="icone"><use href="#icone-olho"/></svg></button>
+                            <p class="campo__erro" id="entrar-senha-erro" role="alert"></p>
+                        </div>
+
+                        <button class="formulario__link formulario__link--direita" type="button" data-aviso="A recuperação de senha chega na versão completa.">Esqueci a senha</button>
+
+                        <button class="botao botao--primario botao--bloco" type="submit">
+                            Entrar
+                            <svg class="icone"><use href="#icone-seta"/></svg>
+                        </button>
+
+                        <p class="formulario__nota">
+                            Ainda não tem conta?
+                            <button class="formulario__link" type="button" data-aba="cadastro">Criar conta</button>
+                        </p>
+                    </form>
+
+                    <form class="formulario" id="formulario-cadastro" data-formulario="cadastro" novalidate hidden>
+
+                        <h1 class="formulario__titulo">Crie sua <em>conta.</em></h1>
+                        <p class="formulario__texto">Use seu e-mail institucional para entrar na comunidade da FATEC.</p>
+
+                        <fieldset class="escolha">
+                            <legend class="campo__rotulo escolha__legenda">Como você vai usar o ColaAí?</legend>
+
+                            <label class="escolha__opcao">
+                                <input class="escolha__botao" type="radio" name="perfil" value="passageiro" checked>
+                                <span class="escolha__cartao">
+                                    <span class="escolha__texto">
+                                        <strong>Quero carona</strong>
+                                        <small>Aluno ou professor que busca vaga no turno</small>
+                                    </span>
+                                </span>
+                            </label>
+
+                            <label class="escolha__opcao">
+                                <input class="escolha__botao" type="radio" name="perfil" value="motorista">
+                                <span class="escolha__cartao">
+                                    <span class="escolha__texto">
+                                        <strong>Tenho carro</strong>
+                                        <small>Ofereço vagas e divido o custo</small>
+                                    </span>
+                                </span>
+                            </label>
+                        </fieldset>
+
+                        <div class="formulario__colunas">
+                        <div class="campo">
+                            <label class="campo__rotulo" for="cadastro-nome">Nome completo</label>
+                            <input class="campo__entrada" id="cadastro-nome" name="nome" type="text" autocomplete="name" placeholder="Nome e sobrenome" data-regra="nome" aria-describedby="cadastro-nome-erro">
+                            <p class="campo__erro" id="cadastro-nome-erro" role="alert"></p>
+                        </div>
+
+                        <div class="campo">
+                            <label class="campo__rotulo" for="cadastro-email">E-mail institucional</label>
+                            <input class="campo__entrada" id="cadastro-email" name="email" type="email" autocomplete="email" placeholder="nome@fatec.sp.gov.br" data-regra="email" aria-describedby="cadastro-email-erro">
+                            <p class="campo__erro" id="cadastro-email-erro" role="alert"></p>
+                        </div>
+                        </div>
+
+                        <div class="formulario__dados-carro" id="dados-carro" hidden>
+                            <div class="campo">
+                                <label class="campo__rotulo" for="cadastro-carro">Modelo do carro</label>
+                                <input class="campo__entrada" id="cadastro-carro" name="carro" type="text" placeholder="Ex.: Honda Civic branco" data-regra="carro" aria-describedby="cadastro-carro-erro">
+                                <p class="campo__erro" id="cadastro-carro-erro" role="alert"></p>
+                            </div>
+
+                            <div class="campo">
+                                <label class="campo__rotulo" for="cadastro-placa">Placa</label>
+                                <input class="campo__entrada" id="cadastro-placa" name="placa" type="text" maxlength="8" autocapitalize="characters" autocomplete="off" placeholder="ABC1D23" data-regra="placa" aria-describedby="cadastro-placa-erro">
+                                <p class="campo__erro" id="cadastro-placa-erro" role="alert"></p>
+                            </div>
+
+                            <fieldset class="campo">
+                                <legend class="campo__rotulo">Vagas para colegas</legend>
+                                <div class="vagas">
+                                    <label class="vagas__opcao"><input class="vagas__botao" type="radio" name="vagas" value="1"><span class="vagas__numero">1</span></label>
+                                    <label class="vagas__opcao"><input class="vagas__botao" type="radio" name="vagas" value="2"><span class="vagas__numero">2</span></label>
+                                    <label class="vagas__opcao"><input class="vagas__botao" type="radio" name="vagas" value="3" checked><span class="vagas__numero">3</span></label>
+                                    <label class="vagas__opcao"><input class="vagas__botao" type="radio" name="vagas" value="4"><span class="vagas__numero">4</span></label>
+                                </div>
+                            </fieldset>
+                        </div>
+
+                        <div class="formulario__colunas">
+                            <div class="campo">
+                                <label class="campo__rotulo" for="cadastro-senha">Senha</label>
+                                <input class="campo__entrada" id="cadastro-senha" name="senha" type="password" autocomplete="new-password" placeholder="Mínimo de 6" data-regra="senha" aria-describedby="cadastro-senha-erro">
+                                <button class="campo__mostrar" type="button" data-mostrar-senha="cadastro-senha" aria-label="Mostrar senha" aria-pressed="false"><svg class="icone"><use href="#icone-olho"/></svg></button>
+                                <p class="campo__erro" id="cadastro-senha-erro" role="alert"></p>
+                            </div>
+
+                            <div class="campo">
+                                <label class="campo__rotulo" for="cadastro-confirmar">Confirmar senha</label>
+                                <input class="campo__entrada" id="cadastro-confirmar" name="confirmar" type="password" autocomplete="new-password" placeholder="Repita a senha" data-regra="confirmar" aria-describedby="cadastro-confirmar-erro">
+                                <button class="campo__mostrar" type="button" data-mostrar-senha="cadastro-confirmar" aria-label="Mostrar senha" aria-pressed="false"><svg class="icone"><use href="#icone-olho"/></svg></button>
+                                <p class="campo__erro" id="cadastro-confirmar-erro" role="alert"></p>
+                            </div>
+                        </div>
+
+                        <div class="campo">
+                            <label class="termos">
+                                <input class="termos__caixa" type="checkbox" name="termos" data-regra="termos" aria-describedby="cadastro-termos-erro">
+                                <span>
+                                    Li e aceito os
+                                    <button class="formulario__link" type="button" data-aviso="O texto completo dos termos fica na versão final.">Termos de Uso</button>
+                                    e a
+                                    <button class="formulario__link" type="button" data-aviso="A política de privacidade fica na versão final.">Política de Privacidade</button>.
+                                </span>
+                            </label>
+                            <p class="campo__erro" id="cadastro-termos-erro" role="alert"></p>
+                        </div>
+
+                        <button class="botao botao--primario botao--bloco" type="submit">
+                            Criar conta
+                            <svg class="icone"><use href="#icone-seta"/></svg>
+                        </button>
+
+                        <p class="formulario__nota">
+                            Já tem conta?
+                            <button class="formulario__link" type="button" data-aba="entrar">Entrar</button>
+                        </p>
+                    </form>
+
+                </section>
+
+                <aside class="vitrine" aria-label="Sobre o ColaAí">
+
+                    <div class="vitrine__conteudo" data-vitrine="entrar">
+                        <p class="formulario__eyebrow">Hub FATEC</p>
+                        <h2 class="vitrine__titulo">Mesmo caminho. <em>Menos carros.</em></h2>
+                        <p class="vitrine__texto">Colegas indo para o mesmo lugar, no mesmo turno, com ponto de encontro fixo.</p>
+
+                        <div class="demo" aria-hidden="true">
+                            <div class="demo__barra">
+                                <span class="demo__pontos"><i></i><i></i><i></i></span>
+                                <span class="demo__titulo">ColaAí · Matches</span>
+                                <span class="demo__vivo">Hoje</span>
+                            </div>
+
+                            <div class="demo__linha">
+                                <span class="avatar">LM</span>
+                                <span class="demo__pessoa"><strong>Lucas Moreira</strong><small>Ida · Manhã · 3 vagas</small></span>
+                                <span class="demo__valor">R$ 1,34</span>
+                            </div>
+
+                            <div class="demo__linha">
+                                <span class="avatar">MD</span>
+                                <span class="demo__pessoa"><strong>Marina Duarte</strong><small>Ida · Manhã · 2 vagas</small></span>
+                                <span class="demo__valor">R$ 0,95</span>
+                            </div>
+
+                            <div class="demo__rodape">
+                                <span>Saída</span>
+                                <span class="demo__trilho"><i></i></span>
+                                <span>FATEC 07:30</span>
+                            </div>
+                        </div>
+
+                        <div class="notificacao" aria-hidden="true">
+                            <span class="notificacao__icone"><svg class="icone"><use href="#icone-sino"/></svg></span>
+                            <span class="notificacao__texto"><strong>Lucas confirmou sua carona</strong><small>Encontro no hub FATEC às 07:30</small></span>
+                        </div>
+                    </div>
+
+                    <div class="vitrine__conteudo" data-vitrine="cadastro" hidden>
+                        <p class="formulario__eyebrow">Rateio amigável</p>
+                        <h2 class="vitrine__titulo">Divida o caminho. <em>Divida o custo.</em></h2>
+                        <p class="vitrine__texto">O Pix é combinado entre vocês. O ColaAí não cobra taxa.</p>
+
+                        <div class="demo demo--preco" aria-hidden="true">
+                            <span class="demo__etiqueta">Por pessoa</span>
+                            <p class="demo__preco"><small>R$</small>1,53<span>/viagem</span></p>
+                            <p class="demo__legenda">Exemplo: 8 km divididos em 3 pessoas</p>
+
+                            <ul class="demo__lista">
+                                <li><svg class="icone"><use href="#icone-check"/></svg>Só e-mail @aluno.cps.sp.gov.br ou @fatec.sp.gov.br</li>
+                                <li><svg class="icone"><use href="#icone-check"/></svg>Hub fixo de encontro, sem desvios</li>
+                                <li><svg class="icone"><use href="#icone-check"/></svg>Match por hub, sentido e turno</li>
+                                <li><svg class="icone"><use href="#icone-check"/></svg>Sem taxa da plataforma</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <p class="vitrine__nota">Dados ilustrativos para fins de demonstração do protótipo.</p>
+                </aside>
+
+            </div>
+        </main>
+
+        <!-- segunda tela aq(tamo falando d pegar carona e tal)-->
+        <div class="app" id="tela-app" hidden>
+
+            <aside class="lateral">
+                <a href="#painel" class="lateral__marca" aria-label="ColaAí">
+                    <img src="./assets/Logo-Marca.png" alt="" class="lateral__imagem">
+                </a>
+
+                <nav class="lateral__nav" aria-label="Seções do painel">
+                    <button class="lateral__botao lateral__botao--ativo" type="button" data-pagina="painel" aria-label="Painel">
+                        <svg class="icone"><use href="#icone-painel"/></svg>
+                    </button>
+                    <button class="lateral__botao" type="button" data-pagina="matches" aria-label="Matches">
+                        <svg class="icone"><use href="#icone-usuarios"/></svg>
+                    </button>
+                    <button class="lateral__botao" type="button" data-pagina="rateio" aria-label="Rateio">
+                        <svg class="icone"><use href="#icone-carteira"/></svg>
+                    </button>
+                    <button class="lateral__botao" type="button" data-pagina="impacto" aria-label="Impacto">
+                        <svg class="icone"><use href="#icone-folha"/></svg>
+                    </button>
+                </nav>
+
+                <button class="lateral__botao lateral__sair" type="button" id="botao-sair" aria-label="Sair">
+                    <svg class="icone"><use href="#icone-sair"/></svg>
+                </button>
+            </aside>
+
+            <div class="painel">
+
+                <header class="topo">
+                    <label class="busca">
+                        <svg class="icone"><use href="#icone-busca"/></svg>
+                        <span class="visualmente-oculto">Buscar colega ou curso</span>
+                        <input class="busca__entrada" id="busca" type="search" placeholder="Buscar colega ou curso" autocomplete="off">
+                    </label>
+
+                    <span class="topo__etiqueta">Protótipo · dados simulados</span>
+
+                    <div class="topo__direita">
+                        <div class="segmento" role="group" aria-label="Tema da página">
+                            <button class="segmento__botao" type="button" data-tema-botao="claro" aria-pressed="true">Claro</button>
+                            <button class="segmento__botao" type="button" data-tema-botao="escuro" aria-pressed="false">Escuro</button>
+                        </div>
+
+                        <div class="usuario">
+                            <span class="avatar" id="usuario-avatar">CA</span>
+                            <span>Olá, <b id="usuario-nome">colega</b></span>
+                            <time class="usuario__data" id="usuario-data"></time>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="grade" id="grade-painel">
+
+                    <!-- cards esq -->
+                    <div class="coluna">
+
+                        <section class="cartao cartao--hubs" id="cartao-hubs" aria-labelledby="hubs-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="hubs-titulo">Hubs de encontro</h2>
+                                <div class="segmento" role="group" aria-label="Sentido da viagem">
+                                    <button class="segmento__botao" type="button" data-sentido="ida" aria-pressed="true">Ida</button>
+                                    <button class="segmento__botao" type="button" data-sentido="volta" aria-pressed="false">Volta</button>
+                                </div>
+                            </div>
+
+                            <div class="hubs__mapa">
+                                <div class="hubs__cartografia" id="mapa" role="region" aria-label="Mapa de Araçatuba com os hubs de encontro"></div>
+                            </div>
+
+                            <div class="hubs__resumo">
+                                <div>
+                                    <span class="rotulo" id="hubs-papel">Destino</span>
+                                    <strong class="hubs__nome">FATEC Araçatuba</strong>
+                                </div>
+                                <div>
+                                    <span class="rotulo" id="hubs-sentido">Ida</span>
+                                    <strong class="hubs__horario" id="hubs-horario">07:30</strong>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="cartao cartao--matches" id="cartao-matches" aria-labelledby="matches-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="matches-titulo">Matches</h2>
+                                <div class="segmento" role="group" aria-label="Filtro da lista">
+                                    <button class="segmento__botao" type="button" data-filtro="compativeis" aria-pressed="true">Compatíveis</button>
+                                    <button class="segmento__botao" type="button" data-filtro="todos" aria-pressed="false">Todos</button>
+                                </div>
+                            </div>
+
+                            <div class="matches__colunas rotulo" aria-hidden="true">
+                                <span>Colega</span>
+                                <span>Horário</span>
+                                <span>Rateio</span>
+                                <span></span>
+                            </div>
+
+                            <ul class="matches__lista" id="lista-matches" aria-live="polite"></ul>
+                        </section>
+
+                    </div>
+
+                    <!-- cards filtros -->
+                    <div class="coluna">
+
+                        <section class="cartao cartao--modo modo" aria-label="Modo de uso">
+                            <span class="modo__icone"><svg class="icone"><use href="#icone-carro"/></svg></span>
+                            <label class="modo__texto" for="interruptor-motorista">
+                                <span class="modo__titulo">Tenho vaga hoje</span>
+                                <span class="modo__descricao" id="modo-descricao">Procurando carona</span>
+                            </label>
+                            <span class="interruptor">
+                                <input class="interruptor__botao" type="checkbox" role="switch" id="interruptor-motorista">
+                                <span class="interruptor__trilho"></span>
+                            </span>
+                        </section>
+
+                        <section class="cartao cartao--turnos" aria-labelledby="turnos-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="turnos-titulo">Turno de estudo</h2>
+                            </div>
+
+                            <div class="turnos__lista" role="group" aria-label="Turno">
+                                <button class="turno" type="button" data-turno="manha" aria-pressed="true">
+                                    <span class="turno__nome">Manhã</span>
+                                    <svg class="icone"><use href="#icone-nascer"/></svg>
+                                    <span class="turno__hora" data-hora-turno="manha">07:30</span>
+                                </button>
+                                <button class="turno" type="button" data-turno="tarde" aria-pressed="false">
+                                    <span class="turno__nome">Tarde</span>
+                                    <svg class="icone"><use href="#icone-sol"/></svg>
+                                    <span class="turno__hora" data-hora-turno="tarde">13:00</span>
+                                </button>
+                                <button class="turno" type="button" data-turno="noite" aria-pressed="false">
+                                    <span class="turno__nome">Noite</span>
+                                    <svg class="icone"><use href="#icone-lua"/></svg>
+                                    <span class="turno__hora" data-hora-turno="noite">18:50</span>
+                                </button>
+                            </div>
+
+                        </section>
+
+                        <section class="cartao cartao--rateio" id="cartao-rateio" aria-labelledby="rateio-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="rateio-titulo">Rateio da viagem</h2>
+                                <button class="mini__link" type="button" data-pagina="rateio">
+                                    Detalhes
+                                    <svg class="icone"><use href="#icone-seta"/></svg>
+                                </button>
+                            </div>
+
+                            <div class="rateio__valor" aria-live="polite">
+                                <span class="rateio__numero" id="rateio-numero">R$ 0,00</span>
+                                <span class="rateio__unidade">por pessoa</span>
+                            </div>
+                            <p class="rateio__detalhe" id="rateio-detalhe"></p>
+
+                            <div class="rateio__divisao" id="rateio-divisao" aria-hidden="true"></div>
+
+                            <label class="rateio__controle">
+                                <span>Distância</span>
+                                <input class="rateio__faixa" id="faixa-km" type="range" min="2" max="30" step="1" value="8">
+                                <output class="rateio__saida" id="saida-km" for="faixa-km">8 km</output>
+                            </label>
+
+                            <label class="rateio__controle">
+                                <span>Caronas</span>
+                                <input class="rateio__faixa" id="faixa-pessoas" type="range" min="1" max="4" step="1" value="2">
+                                <output class="rateio__saida" id="saida-pessoas" for="faixa-pessoas">2</output>
+                            </label>
+
+                        </section>
+
+                    </div>
+
+                    <!-- cards da coluna dos carros (preciso melhorar as imagens ainda e colocar elas - por enquanto ta um placeholder lá segurando) -->
+                    <div class="coluna">
+
+                        <section class="cartao cartao--carro carro" aria-labelledby="carro-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="carro-titulo">Carro</h2>
+                                <span class="carro__etiqueta">Dados simulados</span>
+                            </div>
+
+                            <div class="carro__palco">
+                                <img class="carro__foto" id="carro-foto" alt="" hidden>
+                                <svg class="carro__desenho" viewBox="0 0 470 190" role="img" aria-label="Ilustração de um sedan visto de lado">
+                                    <path class="desenho__chao" d="M20 178 H450"/>
+                                    <path class="desenho__carroceria" d="M34 148 L34 126 C34 118 40 114 50 112 L104 106 C120 104 128 96 142 84 C154 74 170 68 192 66 L270 66 C298 66 322 80 346 102 L398 108 C420 110 438 120 440 136 L440 148 L378 148 A30 30 0 0 0 318 148 L148 148 A30 30 0 0 0 88 148 Z"/>
+                                    <path class="desenho__vidro" d="M144 100 C152 84 168 74 196 72 L226 72 L226 100 Z"/>
+                                    <path class="desenho__vidro" d="M236 72 L270 72 C290 72 308 84 326 100 L236 100 Z"/>
+                                    <path class="desenho__detalhe" d="M231 74 V140 M250 114 H268 M60 136 H84"/>
+                                    <path class="desenho__farol" d="M418 118 L436 124 L436 132 L416 130 Z"/>
+                                    <rect class="desenho__farol" x="34" y="120" width="8" height="12" rx="2"/>
+                                    <circle class="desenho__roda" cx="118" cy="148" r="26"/>
+                                    <circle class="desenho__aro" cx="118" cy="148" r="12"/>
+                                    <circle class="desenho__roda" cx="348" cy="148" r="26"/>
+                                    <circle class="desenho__aro" cx="348" cy="148" r="12"/>
+                                </svg>
+                            </div>
+
+                            <h3 class="carro__nome" id="carro-nome">Fiat Argo</h3>
+                            <p class="carro__dono" id="carro-dono">Selecione um motorista</p>
+
+                            <div class="carro__detalhes">
+                                <div class="carro__vagas" id="carro-vagas" role="img">
+                                    <span class="rotulo">Vagas livres</span>
+                                    <strong class="carro__numero" id="carro-numero">0</strong>
+                                </div>
+
+                                <div class="carro__placa" id="carro-placa" role="img">
+                                    <span class="carro__placa-faixa">Brasil</span>
+                                    <strong class="carro__placa-texto" id="carro-placa-texto">---</strong>
+                                </div>
+                            </div>
+
+                        </section>
+
+                        <section class="mini impacto" id="cartao-impacto" aria-labelledby="impacto-titulo">
+                            <div class="mini__cabecalho">
+                                <h3 class="mini__titulo" id="impacto-titulo">Impacto</h3>
+                                <button class="mini__link" type="button" data-pagina="impacto">
+                                    Detalhes
+                                    <svg class="icone"><use href="#icone-seta"/></svg>
+                                </button>
+                            </div>
+                            <div class="impacto__corpo">
+                                <div class="bateria" id="impacto-bateria" role="img" aria-label="Progresso da meta mensal de caronas">
+                                    <span class="bateria__nivel"><svg class="icone"><use href="#icone-folha"/></svg></span>
+                                </div>
+                                <div class="impacto__dados">
+                                    <div>
+                                        <strong class="impacto__numero" id="impacto-caronas">0</strong>
+                                        <span class="impacto__legenda">caronas</span>
+                                    </div>
+                                    <div>
+                                        <strong class="impacto__numero" id="impacto-co2">0 kg</strong>
+                                        <span class="impacto__legenda">CO₂ evitado</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+
+                    <!-- coluna da carona -->
+                    <div class="coluna">
+
+                        <section class="cartao cartao--escuro cartao--carona carona" aria-labelledby="carona-titulo">
+                            <div class="carona__tile">
+                                <span class="rotulo" id="carona-contexto">Ida · Manhã</span>
+                                <strong class="carona__hora" id="carona-hora">07:30</strong>
+                                <span class="carona__destino" id="carona-destino">Rumo à FATEC</span>
+                                <div class="carona__linha" aria-hidden="true">
+                                    <span class="carona__ponto"></span>
+                                    <span class="carona__trilho"></span>
+                                    <span class="carona__ponto carona__ponto--cheio"></span>
+                                </div>
+                            </div>
+
+                            <h2 class="carona__titulo" id="carona-titulo">Sua carona</h2>
+
+                            <ul class="assentos" id="assentos" aria-live="polite"></ul>
+
+                            <div class="carona__controle">
+                                <span id="carona-lugares">0 de 4 lugares</span>
+                                <button class="carona__desfazer" type="button" id="carona-desfazer">Desfazer</button>
+                            </div>
+                        </section>
+
+                        <section class="mini hub" aria-labelledby="hub-titulo">
+                            <div class="hub__texto">
+                                <h3 class="mini__titulo" id="hub-titulo">Hub FATEC</h3>
+                                <button class="mini__link" type="button" data-alvo="cartao-hubs">
+                                    Ver no mapa
+                                    <svg class="icone"><use href="#icone-seta"/></svg>
+                                </button>
+                            </div>
+
+                            <!-- A ia q fez essa animação mas vo tentar melhorar -->
+                            <div class="hub__marca" aria-hidden="true">
+                                <span class="hub__anel hub__anel--1"></span>
+                                <span class="hub__anel hub__anel--2"></span>
+                                <span class="hub__anel hub__anel--3"></span>
+                                <span class="hub__ponto"><svg class="icone"><use href="#icone-pino"/></svg></span>
+                            </div>
+                        </section>
+
+                    </div>
+
+                </div>
+
+                <section class="pagina pagina-matches" id="pagina-matches" aria-labelledby="pagina-matches-titulo" hidden>
+
+                    <header class="pagina__cabecalho">
+                        <div>
+                            <h1 class="pagina__titulo" id="pagina-matches-titulo">Matches</h1>
+                            <p class="pagina__texto" id="pagina-matches-texto"></p>
+                        </div>
+
+                        <ul class="resumo" aria-label="Resumo dos pedidos">
+                            <li class="resumo__item"><strong id="resumo-pendentes">0</strong>Pendentes</li>
+                            <li class="resumo__item resumo__item--aceito"><strong id="resumo-aceitos">0</strong>Aceitos</li>
+                            <li class="resumo__item"><strong id="resumo-recusados">0</strong>Recusados</li>
+                        </ul>
+                    </header>
+
+                    <div class="pagina-matches__filtros">
+                        <div class="segmento" role="group" aria-label="Filtro da lista">
+                            <button class="segmento__botao" type="button" data-filtro="compativeis" aria-pressed="true">Compatíveis</button>
+                            <button class="segmento__botao" type="button" data-filtro="todos" aria-pressed="false">Todos</button>
+                        </div>
+
+                        <div class="segmento" role="group" aria-label="Sentido da viagem">
+                            <button class="segmento__botao" type="button" data-sentido="ida" aria-pressed="true">Ida</button>
+                            <button class="segmento__botao" type="button" data-sentido="volta" aria-pressed="false">Volta</button>
+                        </div>
+
+                        <div class="segmento" role="group" aria-label="Turno">
+                            <button class="segmento__botao" type="button" data-turno="manha" aria-pressed="true">Manhã</button>
+                            <button class="segmento__botao" type="button" data-turno="tarde" aria-pressed="false">Tarde</button>
+                            <button class="segmento__botao" type="button" data-turno="noite" aria-pressed="false">Noite</button>
+                        </div>
+                    </div>
+
+                    <ul class="pedidos" id="lista-pedidos" aria-live="polite"></ul>
+                </section>
+
+                <section class="pagina pagina-rateio" id="pagina-rateio" aria-labelledby="pagina-rateio-titulo" hidden>
+
+                    <header class="pagina__cabecalho">
+                        <div>
+                            <h1 class="pagina__titulo" id="pagina-rateio-titulo">Rateio</h1>
+                            <p class="pagina__texto">Veja quanto cada pessoa paga pela carona, quanto isso pesa no mês e quanto vai no Pix. O ColaAí só estima o valor: o pagamento é entre vocês, sem taxa.</p>
+                        </div>
+                    </header>
+
+                    <div class="pagina-rateio__corpo">
+
+                        <section class="cartao calculadora" aria-labelledby="calculadora-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="calculadora-titulo">Calculadora da viagem</h2>
+                            </div>
+
+                            <div class="calculadora__resultado" aria-live="polite">
+                                <span class="rotulo">Por pessoa, por viagem</span>
+                                <span class="rateio__numero" id="rp-numero">R$ 0,00</span>
+                                <p class="rateio__detalhe" id="rp-detalhe"></p>
+                            </div>
+
+                            <div class="rateio__divisao" id="rp-divisao" aria-hidden="true"></div>
+
+                            <div class="calculadora__mes">
+                                <strong id="rp-mes">R$ 0,00 por mês</strong>
+                                <span id="rp-mes-detalhe"></span>
+                            </div>
+
+                            <label class="calculadora__controle">
+                                <span>Distância</span>
+                                <input class="rateio__faixa" id="rp-km" type="range" min="2" max="30" step="1">
+                                <output class="rateio__saida" id="rp-saida-km" for="rp-km"></output>
+                            </label>
+                            <label class="calculadora__controle">
+                                <span>Caronas</span>
+                                <input class="rateio__faixa" id="rp-pessoas" type="range" min="1" max="4" step="1">
+                                <output class="rateio__saida" id="rp-saida-pessoas" for="rp-pessoas"></output>
+                            </label>
+                            <label class="calculadora__controle">
+                                <span>Dias na semana</span>
+                                <input class="rateio__faixa" id="rp-dias" type="range" min="1" max="5" step="1">
+                                <output class="rateio__saida" id="rp-saida-dias" for="rp-dias"></output>
+                            </label>
+                            <label class="calculadora__controle">
+                                <span>Consumo</span>
+                                <input class="rateio__faixa" id="rp-consumo" type="range" min="8" max="16" step="1">
+                                <output class="rateio__saida" id="rp-saida-consumo" for="rp-consumo"></output>
+                            </label>
+                            <label class="calculadora__controle">
+                                <span>Litro</span>
+                                <input class="rateio__faixa" id="rp-preco" type="range" min="5" max="8" step="0.1">
+                                <output class="rateio__saida" id="rp-saida-preco" for="rp-preco"></output>
+                            </label>
+
+                            <p class="calculadora__nota">Consumo e preço do litro são premissas provisórias do protótipo. Antes da apresentação, troque por dados da ANP e do Inmetro.</p>
+                        </section>
+
+                        <div class="pagina-rateio__lateral">
+
+                            <section class="cartao comparativo" aria-labelledby="comp-titulo">
+                                <div class="cartao__cabecalho">
+                                    <h2 class="cartao__titulo" id="comp-titulo"></h2>
+                                </div>
+
+                                <ul class="comparativo__linhas" id="comp-linhas"></ul>
+                                <p class="comparativo__resumo" id="comp-resumo" aria-live="polite"></p>
+                                <p class="comparativo__nota" id="comp-nota"></p>
+                                <p class="comparativo__nota" id="comp-co2"></p>
+                            </section>
+
+                            <section class="cartao combinados" aria-labelledby="combinados-titulo">
+                                <div class="cartao__cabecalho">
+                                    <h2 class="cartao__titulo" id="combinados-titulo"></h2>
+                                </div>
+
+                                <ul class="combinados__lista" id="combinados-lista" aria-live="polite"></ul>
+
+                                <p class="combinados__total" id="combinados-total" hidden>
+                                    <span>Total a receber por viagem</span>
+                                    <strong id="combinados-total-valor"></strong>
+                                </p>
+                            </section>
+
+                        </div>
+                    </div>
+                </section>
+
+                <section class="pagina pagina-impacto" id="pagina-impacto" aria-labelledby="pagina-impacto-titulo" hidden>
+
+                    <header class="pagina__cabecalho">
+                        <div>
+                            <h1 class="pagina__titulo" id="pagina-impacto-titulo">Impacto</h1>
+                            <p class="pagina__texto">O que as caronas do mês representam para os alunos e para a cidade. Os números mudam conforme você combina caronas e são estimativas feitas com dados simulados.</p>
+                        </div>
+                    </header>
+
+                    <div class="pagina-impacto__corpo">
+
+                        <ul class="indicadores" aria-label="Indicadores do mês">
+                            <li class="indicador">
+                                <span class="rotulo">Caronas no mês</span>
+                                <strong class="indicador__valor" id="imp-caronas">0</strong>
+                                <span class="indicador__detalhe" id="imp-caronas-detalhe"></span>
+                            </li>
+                            <li class="indicador">
+                                <span class="rotulo">CO₂ evitado</span>
+                                <strong class="indicador__valor" id="imp-co2">0 kg</strong>
+                                <span class="indicador__detalhe">menos gases de efeito estufa</span>
+                            </li>
+                            <li class="indicador">
+                                <span class="rotulo">Economia dos alunos</span>
+                                <strong class="indicador__valor" id="imp-economia">R$ 0,00</strong>
+                                <span class="indicador__detalhe">em relação ao ônibus</span>
+                            </li>
+                            <li class="indicador indicador--meta">
+                                <span class="rotulo">Meta do mês</span>
+                                <strong class="indicador__valor" id="imp-meta">0%</strong>
+                                <span class="indicador__barra"><i id="imp-meta-barra"></i></span>
+                                <span class="indicador__detalhe" id="imp-meta-detalhe"></span>
+                            </li>
+                        </ul>
+
+                        <section class="cartao grafico" aria-labelledby="grafico-titulo">
+                            <div class="cartao__cabecalho">
+                                <h2 class="cartao__titulo" id="grafico-titulo">Caronas por semana</h2>
+                            </div>
+                            <ul class="grafico__colunas" id="imp-semanas"></ul>
+                            <p class="comparativo__nota">Semanas anteriores simuladas. A semana atual inclui o que você combinou.</p>
+                        </section>
+
+                        <div class="pagina-impacto__lateral">
+
+                            <section class="cartao" aria-labelledby="turnos-impacto-titulo">
+                                <div class="cartao__cabecalho">
+                                    <h2 class="cartao__titulo" id="turnos-impacto-titulo">Caronas por turno</h2>
+                                </div>
+                                <ul class="comparativo__linhas" id="imp-turnos"></ul>
+                            </section>
+
+                            <section class="cartao" aria-labelledby="premissas-titulo">
+                                <div class="cartao__cabecalho">
+                                    <h2 class="cartao__titulo" id="premissas-titulo">Como calculamos</h2>
+                                </div>
+                                <ul class="premissas" id="imp-premissas"></ul>
+                            </section>
+
+                        </div>
+                    </div>
+                </section>
+
+                <p class="rodape-painel">
+                    ColaAí · protótipo para o Ideathon. CNH, perfis e rotas simulados, sem GPS e sem pagamento dentro do app.
+                </p>
+
+            </div>
+        </div>
+
+        <p class="aviso" id="aviso" role="status"></p>
+
+        <script src="./dados.js"></script>
+        <script src="./script.js"></script>
+    </body>
+</html>
